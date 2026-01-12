@@ -1,0 +1,13 @@
+{
+  "name": "teachpivot",
+  "version": "1.0.0",
+  "description": "Privacy-first PWA for teachers",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
