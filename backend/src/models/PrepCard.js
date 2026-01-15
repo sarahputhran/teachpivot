@@ -8,7 +8,7 @@ const prepCardSchema = new mongoose.Schema({
   },
   grade: {
     type: Number,
-    enum: [3],
+    enum: [3, 4],
     required: true
   },
   topicId: {

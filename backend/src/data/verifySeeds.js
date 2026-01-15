@@ -18,24 +18,47 @@ const verify = async () => {
         console.log(`   - Maths: ${mathsCards} cards`);
         console.log(`   - EVS: ${evsCards} cards`);
 
-        // EVS Chapters
-        console.log(`\n📚 EVS Chapters:`);
-        const evsTopics = ['family_friends', 'going_mela', 'celebrating_festivals', 'plants', 'plants_animals'];
-        for (const topicId of evsTopics) {
-            const count = await PrepCard.countDocuments({ subject: 'EVS', topicId });
+        // Count by grade
+        const grade3Cards = await PrepCard.countDocuments({ grade: 3 });
+        const grade4Cards = await PrepCard.countDocuments({ grade: 4 });
+        console.log(`\n[info] By Grade:`);
+        console.log(`   - Grade 3: ${grade3Cards} cards`);
+        console.log(`   - Grade 4: ${grade4Cards} cards`);
+
+        // EVS Chapters (Grade 3)
+        console.log(`\n[info] EVS Grade 3 Chapters:`);
+        const evsTopicsGrade3 = ['family_friends', 'going_mela', 'celebrating_festivals', 'plants', 'plants_animals'];
+        for (const topicId of evsTopicsGrade3) {
+            const count = await PrepCard.countDocuments({ subject: 'EVS', grade: 3, topicId });
             console.log(`   ${topicId}: ${count} cards`);
         }
 
-        // Math Chapters
-        console.log(`\n📐 Math Chapters:`);
-        const mathTopics = ['whats_name', 'toy_joy', 'double_century', 'vacation_nani', 'shapes'];
-        for (const topicId of mathTopics) {
-            const count = await PrepCard.countDocuments({ subject: 'Maths', topicId });
+        // EVS Chapters (Grade 4)
+        console.log(`\n[info] EVS Grade 4 Chapters:`);
+        const evsTopicsGrade4 = ['living_together', 'exploring_neighbourhood', 'nature_trail', 'growing_up_with_nature', 'food_for_health'];
+        for (const topicId of evsTopicsGrade4) {
+            const count = await PrepCard.countDocuments({ subject: 'EVS', grade: 4, topicId });
+            console.log(`   ${topicId}: ${count} cards`);
+        }
+
+        // Math Chapters (Grade 3)
+        console.log(`\n[info] Math Grade 3 Chapters:`);
+        const mathTopicsGrade3 = ['whats_name', 'toy_joy', 'double_century', 'vacation_nani', 'shapes'];
+        for (const topicId of mathTopicsGrade3) {
+            const count = await PrepCard.countDocuments({ subject: 'Maths', grade: 3, topicId });
+            console.log(`   ${topicId}: ${count} cards`);
+        }
+
+        // Math Chapters (Grade 4)
+        console.log(`\n[info] Math Grade 4 Chapters:`);
+        const mathTopicsGrade4 = ['shapes_around_us', 'hide_and_seek', 'patterns_around_us', 'thousands_around_us', 'how_heavy_how_light'];
+        for (const topicId of mathTopicsGrade4) {
+            const count = await PrepCard.countDocuments({ subject: 'Maths', grade: 4, topicId });
             console.log(`   ${topicId}: ${count} cards`);
         }
 
         // Count by situation type
-        console.log(`\n🎯 By Situation Type:`);
+        console.log(`\n[info] By Situation Type (all grades):`);
         const situations = [
             'prerequisite_gap',
             'cant_visualize',
@@ -50,7 +73,11 @@ const verify = async () => {
         }
 
         await mongoose.disconnect();
-        console.log(`\n✅ Verification complete!`);
+        console.log(`\n[ok] Verification complete!`);
+        console.log(`\n[info] Expected totals:`);
+        console.log(`   - Grade 3: 90 cards (45 EVS + 45 Maths)`);
+        console.log(`   - Grade 4: 90 cards (45 EVS + 45 Maths)`);
+        console.log(`   - Grand Total: 180 cards`);
     } catch (error) {
         console.error('Error:', error);
         process.exit(1);
