@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const prepCardSchema = new mongoose.Schema({
   subject: {
     type: String,
-    enum: ['Maths', 'Science'],
+    enum: ['Maths', 'EVS'],
     required: true
   },
   grade: {
     type: Number,
-    enum: [8, 9, 10],
+    enum: [3, 4],
     required: true
   },
   topicId: {

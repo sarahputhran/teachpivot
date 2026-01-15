@@ -46,7 +46,7 @@ export default function CRPDashboard() {
             >
               <option value="">All Subjects</option>
               <option value="Maths">Maths</option>
-              <option value="Science">Science</option>
+              <option value="EVS">EVS</option>
             </select>
             <select
               value={filters.grade}
@@ -54,9 +54,8 @@ export default function CRPDashboard() {
               className="px-4 py-2 border rounded-lg"
             >
               <option value="">All Grades</option>
-              <option value="8">Grade 8</option>
-              <option value="9">Grade 9</option>
-              <option value="10">Grade 10</option>
+              <option value="3">Grade 3</option>
+              <option value="4">Grade 4</option>
             </select>
           </div>
         </div>

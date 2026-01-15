@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const curriculumSchema = new mongoose.Schema({
   subject: {
     type: String,
-    enum: ['Maths', 'Science'],
+    enum: ['Maths', 'Science', 'EVS'],
     required: true
   },
   grade: {
     type: Number,
-    enum: [9, 10],
+    enum: [3, 4],
     required: true
   },
   topics: [{
