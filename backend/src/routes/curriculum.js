@@ -5,8 +5,8 @@ const Curriculum = require('../models/Curriculum');
 // GET all subjects and grades
 router.get('/subjects', async (req, res) => {
   try {
-    const subjects = ['Maths', 'Science'];
-    const grades = [8, 9, 10];
+    const subjects = ['Maths', 'EVS'];
+    const grades = [3];
     res.json({ subjects, grades });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -21,11 +21,11 @@ router.get('/:subject/:grade/topics', async (req, res) => {
       subject,
       grade: parseInt(grade)
     });
-    
+
     if (!curriculum) {
       return res.status(404).json({ error: 'Curriculum not found' });
     }
-    
+
     res.json(curriculum.topics || []);
   } catch (error) {
     res.status(500).json({ error: error.message });

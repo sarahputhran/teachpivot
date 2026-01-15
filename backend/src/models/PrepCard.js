@@ -8,7 +8,7 @@ const prepCardSchema = new mongoose.Schema({
   },
   grade: {
     type: Number,
-    enum: [3, 4],
+    enum: [3],
     required: true
   },
   topicId: {
@@ -17,14 +17,6 @@ const prepCardSchema = new mongoose.Schema({
   },
   situation: {
     type: String,
-    enum: [
-      'prerequisite_gap',
-      'cant_visualize',
-      'mixed_pace',
-      'language_not_landing',
-      'activity_chaos',
-      'worked_once_failed_later'
-    ],
     required: true
   },
   whatBreaksHere: String,

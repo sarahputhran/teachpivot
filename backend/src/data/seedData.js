@@ -60,7 +60,7 @@ const seedData = async () => {
     // ===== EVS CHAPTER 1: Family and Friends (9 cards) =====
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap – "Family = Only Parents"',
       whatBreaksHere: 'Students have a narrow idea of family and miss the concept of different family members and structures.',
       earlyWarningSigns: ['Children name only parents when asked about family', 'Silence when asked about grandparents or relatives'],
       ifStudentsLost: ['Ask students to name who lives with them and who visits them often', 'Draw two circles on the board: "Lives with me" and "Visits us"'],
@@ -70,7 +70,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'worked_once_failed_later',
+      situation: 'Conceptual Gap – Worked Earlier, Failed Later',
       whatBreaksHere: 'Children remember names but don\'t connect family with care and responsibility.',
       earlyWarningSigns: ['One-word answers like "mother cooks" repeated by many', 'Copying from classmates during table work'],
       ifStudentsLost: ['Act out one task (e.g., watering plants) and ask who does this at home', 'Write one shared task and ask students to add who helps'],
@@ -80,7 +80,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'cant_visualize',
+      situation: 'Can\'t Visualize – Family Activities',
       whatBreaksHere: 'Learning remains abstract because students don\'t connect text with real life.',
       earlyWarningSigns: ['Blank stares during reading', 'Random answers not linked to the story'],
       ifStudentsLost: ['Ask students to close eyes and recall one evening at home', 'Let 2–3 students describe what everyone was doing'],
@@ -90,7 +90,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
       whatBreaksHere: 'One-speed teaching doesn\'t work for varied literacy levels.',
       earlyWarningSigns: ['Early finishers talking loudly', 'Slow writers copying blindly'],
       ifStudentsLost: ['Allow oral responses instead of writing', 'Pair slow writers with a supportive peer'],
@@ -100,7 +100,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
       whatBreaksHere: 'Vocabulary blocks understanding of relationships.',
       earlyWarningSigns: ['Students ask "What is this word?" repeatedly', 'Wrong matching in relationship activities'],
       ifStudentsLost: ['Use local words for relationships first', 'Ask students to translate terms into home language'],
@@ -110,7 +110,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos – Drawing and Rangoli',
       whatBreaksHere: 'Activity lacks structure, leading to loss of learning focus.',
       earlyWarningSigns: ['Children roaming around', 'Materials being misused'],
       ifStudentsLost: ['Demonstrate one simple example first', 'Set a clear time limit and task goal'],
@@ -120,7 +120,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'cant_visualize',
+      situation: '"Only Humans Are Family"',
       whatBreaksHere: 'Emotional connection with animals is missing.',
       earlyWarningSigns: ['Laughing at pet-related examples', 'Saying "animals don\'t belong in family"'],
       ifStudentsLost: ['Ask who feeds or cares for animals at home', 'Relate care of animals to care of people'],
@@ -130,7 +130,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'prerequisite_gap',
+      situation: 'Family Size Confusion',
       whatBreaksHere: 'Value judgment replaces understanding of diversity.',
       earlyWarningSigns: ['Teasing comments', 'Comparing families competitively'],
       ifStudentsLost: ['Show examples of both big and small families', 'Emphasize care, not number'],
@@ -140,7 +140,9 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'family_friends',
-      situation: 'prerequisite_gap',
+      situation: 'Helping = Adult\'s Job',
+      whatBreaksHere: 'Children don\'t see themselves as contributors.',
+      earlyWarningSigns: ['Saying "I don\'t do anything"', 'Laughing at helping tasks'],
       ifStudentsLost: ['Ask simple questions about daily routines', 'List even small tasks on the board'],
       ifStudentsBored: ['Ask them to plan one new way they can help', 'Let them predict how it helps the family'],
       successRate: 0.67, peerInsights: { count: 6, insight: 'Recognizing small contributions boosted student engagement.' }, confidence: 0.72
@@ -149,7 +151,7 @@ const seedData = async () => {
     // ===== EVS CHAPTER 2: Going to the Mela (9 cards) =====
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'going_mela',
-      situation: 'prerequisite_gap',
+      situation: 'Missing the Basic Idea of a Mela',
       whatBreaksHere: 'Students see the mela only as fun rides, not as a place with work, people, money, and culture.',
       earlyWarningSigns: ['Students only mention swings and toys', 'Blank looks when asked about shopkeepers or workers'],
       ifStudentsLost: ['Ask, "Who all work in a mela?" and list answers on the board', 'Group items into people, work, and fun'],
@@ -159,7 +161,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'going_mela',
-      situation: 'worked_once_failed_later',
+      situation: 'Concept Understood Initially, Forgotten Later',
       whatBreaksHere: 'Learning stayed verbal and didn\'t turn into understanding they can recall later.',
       earlyWarningSigns: ['Correct oral answers, wrong written ones', 'Copying from the board without thinking'],
       ifStudentsLost: ['Revisit using a quick recap game (name one mela worker)', 'Let students explain answers to a partner before writing'],
@@ -209,7 +211,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'going_mela',
-      situation: 'cant_visualize',
+      situation: 'Mela = Only Fun, Not Work',
       whatBreaksHere: 'Partial understanding of mela features.',
       earlyWarningSigns: ['Only ride-related answers', 'Ignoring sellers and buyers'],
       ifStudentsLost: ['Make two columns: ride / work', 'Fill together with examples'],
@@ -219,7 +221,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'going_mela',
-      situation: 'cant_visualize',
+      situation: 'Money Concepts Are Too Abstract',
       whatBreaksHere: 'Economic ideas are too abstract.',
       earlyWarningSigns: ['Random answers about money', 'Confusion between free and paid items'],
       ifStudentsLost: ['Do a pretend buying activity with paper money', 'Talk aloud through each step'],
@@ -229,7 +231,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'going_mela',
-      situation: 'prerequisite_gap',
+      situation: 'Safety and Responsibility Missing',
       whatBreaksHere: 'Life-skill learning is getting skipped.',
       earlyWarningSigns: ['No mention of dustbins or crowd safety', 'Unsafe ideas during role-play'],
       ifStudentsLost: ['Ask "What can go wrong at a mela?"', 'List problems and solutions together'],
@@ -300,7 +302,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
-      situation: 'prerequisite_gap',
+      situation: 'Religious vs Cultural Festivals',
       whatBreaksHere: 'Understanding that festivals can be religious, seasonal, or cultural.',
       earlyWarningSigns: ['"This festival is only for them" statements', 'Hesitation to discuss unfamiliar festivals'],
       ifStudentsLost: ['Classify festivals into religious, seasonal, national', 'Discuss one example from each category'],
@@ -310,7 +312,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
-      situation: 'cant_visualize',
+      situation: 'Festival vs Holiday Confusion',
       whatBreaksHere: 'Difference between a festival and a general holiday is unclear.',
       earlyWarningSigns: ['Calling Sunday or summer vacation a festival', 'Incorrect examples in answers'],
       ifStudentsLost: ['Make a two-column chart: festival vs holiday', 'Fill examples together'],
@@ -320,7 +322,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
-      situation: 'prerequisite_gap',
+      situation: 'Celebrations and Responsibility',
       whatBreaksHere: 'Connection between celebrations and responsibility is missing.',
       earlyWarningSigns: ['Excitement about crackers without reflection', 'No mention of cleanliness or safety'],
       ifStudentsLost: ['Ask "What problems can happen during festivals?"', 'List solutions next to each problem'],
@@ -391,7 +393,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants',
-      situation: 'cant_visualize',
+      situation: 'Plant Comparison Skills Missing',
       whatBreaksHere: 'Lack of comparison thinking; differences aren\'t highlighted.',
       earlyWarningSigns: ['Same description used for all plants', 'No mention of size or stem type'],
       ifStudentsLost: ['Line up examples by size on the board', 'Ask "what is different?" instead of "what is this?"'],
@@ -401,7 +403,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants',
-      situation: 'prerequisite_gap',
+      situation: 'Leaves Are Just for Looks',
       whatBreaksHere: 'The function of leaves (food-making) is not internalised.',
       earlyWarningSigns: ['Students say leaves are "for looks"', 'No link between leaves and plant survival'],
       ifStudentsLost: ['Ask what would happen if all leaves fell off', 'Connect leaves to eating and energy in humans'],
@@ -411,7 +413,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants',
-      situation: 'prerequisite_gap',
+      situation: 'Plants Don\'t Need Care',
       whatBreaksHere: 'The connection between plants and life processes is weak.',
       earlyWarningSigns: ['Students say plants don\'t need care', 'No mention of water, air, or sunlight'],
       ifStudentsLost: ['Compare plants to pets needing care', 'List what happens if plants are ignored'],
@@ -482,7 +484,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
-      situation: 'cant_visualize',
+      situation: 'Animals Only Take, Plants Only Give',
       whatBreaksHere: 'One-way understanding of dependence; missed idea of mutual support.',
       earlyWarningSigns: ['Students say animals only take from plants', 'No mention of seeds, manure, or pollination'],
       ifStudentsLost: ['Use examples: cow dung for plants, birds spreading seeds', 'Draw arrows both ways between plant and animal'],
@@ -492,7 +494,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
-      situation: 'prerequisite_gap',
+      situation: 'Wild, Pet, Farm Animal Confusion',
       whatBreaksHere: 'Classification skills are weak; real-life context not connected.',
       earlyWarningSigns: ['Calling a lion a pet or a dog a wild animal', 'Confusion during sorting activities'],
       ifStudentsLost: ['Use "Where do you see it daily?" as the rule', 'Make three columns and place animals together'],
@@ -502,7 +504,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
-      situation: 'cant_visualize',
+      situation: 'Humans Are Separate from Nature',
       whatBreaksHere: 'Humans are seen as separate from nature; missed idea of shared dependence.',
       earlyWarningSigns: ['Food chains without humans', 'Statements like "nature is for animals"'],
       ifStudentsLost: ['Ask "What did you eat today?" Trace it back to plants', 'Add humans into existing food chains'],
@@ -573,7 +575,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'whats_name',
-      situation: 'prerequisite_gap',
+      situation: 'Place Value Not Understood',
       whatBreaksHere: 'Students don\'t grasp that place changes value; "5" is always treated as just five.',
       earlyWarningSigns: ['Says 5 in 50 equals 5 in 500', 'Can\'t explain why numbers change when digits move'],
       ifStudentsLost: ['Write the same digit in different places and compare', 'Use "How much?" instead of "Which digit?"'],
@@ -583,7 +585,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'whats_name',
-      situation: 'language_not_landing',
+      situation: 'Number Names = Spelling Only',
       whatBreaksHere: 'Writing is treated as spelling, not meaning; no link between spoken number and written form.',
       earlyWarningSigns: ['Correct spelling but wrong number', 'Writes long names for small numbers'],
       ifStudentsLost: ['Break number names into parts (two thousand + three)', 'Match number cards with name cards'],
@@ -593,7 +595,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'whats_name',
-      situation: 'prerequisite_gap',
+      situation: 'More Digits = Bigger Number',
       whatBreaksHere: 'Comparison is based on digit count, not place value; thousands concept is shaky.',
       earlyWarningSigns: ['Says 999 is bigger than 1,200', 'Looks only at number of digits'],
       ifStudentsLost: ['Compare starting from the leftmost digit together', 'Use place value charts side by side'],
@@ -664,7 +666,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
-      situation: 'cant_visualize',
+      situation: 'Patterns Must Repeat Logically',
       whatBreaksHere: 'Students don\'t understand that patterns must repeat logically.',
       earlyWarningSigns: ['Random arrangements labelled as patterns', 'No explanation when asked "why"'],
       ifStudentsLost: ['Show one repeating and one random example side by side', 'Ask students to clap when repetition occurs'],
@@ -674,7 +676,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
-      situation: 'prerequisite_gap',
+      situation: 'Lost Track of Position',
       whatBreaksHere: 'Poor tracking of position and sequence.',
       earlyWarningSigns: ['Skipping items while counting', 'Different answers from same pattern'],
       ifStudentsLost: ['Mark every 5th or 10th item visibly', 'Encourage finger-point counting'],
@@ -684,7 +686,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
-      situation: 'language_not_landing',
+      situation: 'Silent Reasoning, No Explanation',
       whatBreaksHere: 'Reasoning is happening silently, not explicitly.',
       earlyWarningSigns: ['Correct answers with no explanation', '"I just know" responses'],
       ifStudentsLost: ['Model sentence frames like "The rule is…"', 'Ask students to say the rule before writing'],
@@ -755,7 +757,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'double_century',
-      situation: 'cant_visualize',
+      situation: 'Hundred Means Big',
       whatBreaksHere: 'The idea of 100 as a unit is unclear.',
       earlyWarningSigns: ['Students say "hundred means big"', 'Inaccurate grouping into hundreds'],
       ifStudentsLost: ['Build exactly 100 using 10 bundles of 10', 'Count aloud together to reach 100 once'],
@@ -765,7 +767,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'double_century',
-      situation: 'prerequisite_gap',
+      situation: 'Expanded Form Errors',
       whatBreaksHere: 'Link between digit position and value is weak.',
       earlyWarningSigns: ['Writing incorrect expanded forms', 'Skipping place value labels'],
       ifStudentsLost: ['Always write H–T–O columns before expanding', 'Use spoken explanations alongside writing'],
@@ -775,7 +777,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'double_century',
-      situation: 'worked_once_failed_later',
+      situation: 'Counting Is Just Memorized',
       whatBreaksHere: 'Counting sequence is memorized, not understood.',
       earlyWarningSigns: ['Can\'t say the number before or after', 'Freeze when counting starts mid-way'],
       ifStudentsLost: ['Practice counting forward and backward from random numbers', 'Use jump counting on a number line'],
@@ -846,7 +848,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
-      situation: 'cant_visualize',
+      situation: 'Addition vs Subtraction Direction',
       whatBreaksHere: 'Poor understanding of addition vs subtraction movement.',
       earlyWarningSigns: ['Subtraction shown as forward jumps', 'Answers larger than start number'],
       ifStudentsLost: ['Use arrows with + and – labels', 'Ask "Are we getting more or less?"'],
@@ -856,7 +858,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
-      situation: 'prerequisite_gap',
+      situation: 'Estimation = Wild Guessing',
       whatBreaksHere: 'Estimation is seen as guessing, not reasoning.',
       earlyWarningSigns: ['Wild guesses', 'No explanation offered'],
       ifStudentsLost: ['Anchor to nearest tens', 'Ask "Will it be more or less than 100?"'],
@@ -866,7 +868,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
-      situation: 'worked_once_failed_later',
+      situation: 'Only One Method Is Right',
       whatBreaksHere: 'Flexibility in thinking is missing.',
       earlyWarningSigns: ['Rejecting peer solutions', 'Saying "this is wrong" without listening'],
       ifStudentsLost: ['Show two methods side-by-side', 'Ask which feels easier and why'],
@@ -937,7 +939,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'shapes',
-      situation: 'cant_visualize',
+      situation: '2D vs 3D Properties Confusion',
       whatBreaksHere: 'Students don\'t separate 2D properties from 3D properties.',
       earlyWarningSigns: ['Saying a cube has 6 sides', 'Counting faces as corners'],
       ifStudentsLost: ['Write "Flat Shape" and "Solid Shape" headings', 'Sort properties together on the board'],
@@ -947,7 +949,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'shapes',
-      situation: 'prerequisite_gap',
+      situation: 'Drawing Skills Are Poor',
       whatBreaksHere: 'Motor control and shape properties aren\'t linked.',
       earlyWarningSigns: ['Crooked squares', 'Triangles with curved sides'],
       ifStudentsLost: ['Draw slowly step-by-step on the board', 'Ask students to draw along in the air'],
@@ -957,7 +959,7 @@ const seedData = async () => {
 
     prepCards.push(new PrepCard({
       subject: 'Maths', grade: 3, topicId: 'shapes',
-      situation: 'cant_visualize',
+      situation: 'Shapes Only Exist in Textbooks',
       whatBreaksHere: 'Learning stays abstract and textbook-bound.',
       earlyWarningSigns: ['"We only see shapes in maths" comments', 'Difficulty giving real examples'],
       ifStudentsLost: ['Walk around class pointing to shape examples', 'Ask students to name objects from home'],
