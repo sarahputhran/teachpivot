@@ -74,7 +74,7 @@ function App() {
         <ContextSelection onContextSelect={handleContextSelect} />
       )}
       {currentPage === 'situationSelection' && context && (
-        <SituationSelection context={context} onSituationSelect={handleSituationSelect} />
+        <SituationSelection context={context} onSituationSelect={handleSituationSelect} onBack={handleBack} />
       )}
       {currentPage === 'prepCard' && context && situation && (
         <PrepCardPage context={context} situation={situation} onBack={handleBack} />
