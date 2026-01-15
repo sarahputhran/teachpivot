@@ -6,7 +6,7 @@ const Curriculum = require('../models/Curriculum');
 router.get('/subjects', async (req, res) => {
   try {
     const subjects = ['Maths', 'EVS'];
-    const grades = [3];
+    const grades = [3, 4];
     res.json({ subjects, grades });
   } catch (error) {
     res.status(500).json({ error: error.message });

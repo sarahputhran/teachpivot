@@ -14,7 +14,7 @@ export default function ContextSelection({ onContextSelect, onBack }) {
     { name: 'Maths', icon: '🧮', color: 'bg-blue-100', colorHover: 'hover:bg-blue-50', borderColor: 'hover:border-blue-300' },
     { name: 'EVS', icon: '🌍', color: 'bg-green-100', colorHover: 'hover:bg-green-50', borderColor: 'hover:border-green-300' }
   ];
-  const grades = [3];
+  const grades = [3, 4];
 
   useEffect(() => {
     if (subject && grade && step === 'topic') {
