@@ -6,18 +6,16 @@ const connectDB = require('./middleware/db');
 
 const app = express();
 
-/**
- * Initialize application
- * - Connects to MongoDB Atlas
- * - Verifies data presence
- * - Does NOT auto-seed by default
- */
+/* =========================
+   Initialize application
+   ========================= */
+
 const initializeApp = async () => {
   try {
-    // 1. Connect to MongoDB Atlas
+    // Connect to MongoDB (local or cloud)
     await connectDB();
 
-    // 2. Sanity check: confirm PrepCards exist
+    // Sanity check: confirm PrepCards exist
     const PrepCard = require('./models/PrepCard');
     const prepCardCount = await PrepCard.countDocuments();
 
@@ -41,8 +39,9 @@ initializeApp();
    Middleware
    ========================= */
 
+// ✅ FIXED CORS (allows ANY localhost port for dev)
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true
 }));
 
