@@ -1,22 +1,19 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
+  const mongoURI = process.env.MONGODB_URI;
+
+  if (!mongoURI) {
+    console.error('MONGODB_URI is not defined in environment variables');
+    process.exit(1);
+  }
+
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/teachpivot';
     await mongoose.connect(mongoURI);
-    console.log('MongoDB connected:', mongoURI);
+    console.log('MongoDB Atlas connected');
   } catch (error) {
-    console.log('[info] Local MongoDB unavailable, using in-memory database...');
-    try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongoServer = await MongoMemoryServer.create();
-      const mongoUri = mongoServer.getUri();
-      await mongoose.connect(mongoUri);
-      console.log('[ok] MongoDB Memory Server connected');
-    } catch (memError) {
-      console.error('Connection error:', error);
-      process.exit(1);
-    }
+    console.error('MongoDB Atlas connection failed:', error.message);
+    process.exit(1);
   }
 };
 
