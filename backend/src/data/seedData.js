@@ -2,8 +2,6 @@
 
 // Run with: node src/data/seedData.js
 
-
-
 require('dotenv').config();
 
 const mongoose = require('mongoose');
@@ -12,53 +10,30 @@ const Curriculum = require('../models/Curriculum');
 
 const PrepCard = require('../models/PrepCard');
 
-
-
 const connectDB = async () => {
+  const mongoURI = process.env.MONGO_URI;
 
-  try {
+  console.log('>>> SEED SCRIPT USING MONGO_URI:', mongoURI);
 
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/teachpivot');
-
-    console.log('MongoDB connected for seeding');
-
-  } catch (error) {
-
-    console.log('[info] Local MongoDB unavailable, using in-memory database...');
-
-    try {
-
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-
-      const mongoServer = await MongoMemoryServer.create();
-
-      const mongoUri = mongoServer.getUri();
-
-      await mongoose.connect(mongoUri);
-
-      console.log('[ok] MongoDB Memory Server connected for seeding');
-
-    } catch (memError) {
-
-      console.error('Connection error:', error);
-
-      process.exit(1);
-
-    }
-
+  if (!mongoURI) {
+    console.error('MONGO_URI is not defined. Aborting seed.');
+    process.exit(1);
   }
 
+  try {
+    await mongoose.connect(mongoURI);
+    console.log('MongoDB Atlas connected for seeding');
+  } catch (error) {
+    console.error('Failed to connect to MongoDB Atlas:', error.message);
+    process.exit(1);
+  }
 };
-
-
 
 const seedData = async () => {
 
   try {
 
     await connectDB();
-
-
 
     // Clear existing data
 
@@ -67,8 +42,6 @@ const seedData = async () => {
     await PrepCard.deleteMany({});
 
     console.log('Cleared existing data');
-
-
 
     // ===== CURRICULUM SETUP =====
 
@@ -2142,7 +2115,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Confusing Prism and Pyramid',
+            situation: 'Confusing Prism and Pyramid',
 
             whatBreaksHere: 'Students mix up prisms and pyramids while naming or sorting.',
 
@@ -2158,7 +2131,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Angle Type Confusion',
+            situation: 'Angle Type Confusion',
 
             whatBreaksHere: 'Students cannot correctly identify right, acute, and obtuse angles.',
 
@@ -2174,7 +2147,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Circle Parts Misunderstood',
+            situation: 'Circle Parts Misunderstood',
 
             whatBreaksHere: 'Students mix up radius, diameter, and centre of a circle.',
 
@@ -2296,7 +2269,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Top View vs Front View Confusion',
+            situation: 'Top View vs Front View Confusion',
 
             whatBreaksHere: 'Students mix up top view and front view of objects like bricks or chairs.',
 
@@ -2312,7 +2285,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Grid Direction Errors',
+            situation: 'Grid Direction Errors',
 
             whatBreaksHere: 'Students move diagonally or miscount steps in grid games.',
 
@@ -2328,7 +2301,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Map Reading Confusion',
+            situation: 'Map Reading Confusion',
 
             whatBreaksHere: 'Students struggle to trace routes on the school sight map.',
 
@@ -2450,7 +2423,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Even/Odd Rule Confusion',
+            situation: 'Even/Odd Rule Confusion',
 
             whatBreaksHere: 'Students misclassify numbers as even or odd without checking pairs.',
 
@@ -2466,7 +2439,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Money Pattern Counting Errors',
+            situation: 'Money Pattern Counting Errors',
 
             whatBreaksHere: 'Students miscount money when coins and notes are arranged in patterns.',
 
@@ -2482,7 +2455,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Pattern Generalisation Difficulty',
+            situation: 'Pattern Generalisation Difficulty',
 
             whatBreaksHere: 'Students struggle to state rules like "before and after an odd number".',
 
@@ -2604,7 +2577,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Zero as Placeholder Confusion',
+            situation: 'Zero as Placeholder Confusion',
 
             whatBreaksHere: 'Students ignore zeros while reading or writing 4-digit numbers.',
 
@@ -2620,7 +2593,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Number Line Misplacement',
+            situation: 'Number Line Misplacement',
 
             whatBreaksHere: 'Students mark 4-digit numbers incorrectly on number lines.',
 
@@ -2636,7 +2609,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Comparing Large Numbers Error',
+            situation: 'Comparing Large Numbers Error',
 
             whatBreaksHere: 'Students compare numbers using last digits instead of place value.',
 
@@ -2758,7 +2731,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Size vs Weight Confusion',
+            situation: 'Size vs Weight Confusion',
 
             whatBreaksHere: 'Students assume bigger objects are always heavier.',
 
@@ -2774,7 +2747,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Balance Equality Misunderstood',
+            situation: 'Balance Equality Misunderstood',
 
             whatBreaksHere: 'Students think balanced scales mean one side is heavier.',
 
@@ -2790,7 +2763,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Indirect Comparison Difficulty',
+            situation: 'Indirect Comparison Difficulty',
 
             whatBreaksHere: 'Students struggle when comparing weights using a third object.',
 
@@ -2932,7 +2905,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Public Place Ownership Confusion',
+            situation: 'Public Place Ownership Confusion',
 
             whatBreaksHere: 'Students think public places belong to the government, not people.',
 
@@ -2948,7 +2921,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Festival Seen Only as Celebration',
+            situation: 'Festival Seen Only as Celebration',
 
             whatBreaksHere: 'Students miss the idea of cooperation in festivals like Van Mahotsav.',
 
@@ -2964,7 +2937,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Help as Charity Only',
+            situation: 'Help as Charity Only',
 
             whatBreaksHere: 'Students think helping others is optional kindness, not mutual support.',
 
@@ -3086,7 +3059,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Communication Past vs Present Confusion',
+            situation: 'Communication Past vs Present Confusion',
 
             whatBreaksHere: 'Students mix up older and modern ways of communication.',
 
@@ -3102,7 +3075,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Direction Sense Confusion',
+            situation: 'Direction Sense Confusion',
 
             whatBreaksHere: 'Students confuse north, south, east, and west while reading maps.',
 
@@ -3118,7 +3091,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Development vs Environment Misunderstanding',
+            situation: 'Development vs Environment Misunderstanding',
 
             whatBreaksHere: 'Students think development always harms nature.',
 
@@ -3240,7 +3213,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Forest Rules Seen as Restrictions',
+            situation: 'Forest Rules Seen as Restrictions',
 
             whatBreaksHere: 'Students see safety rules as unnecessary restrictions.',
 
@@ -3256,7 +3229,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Footprint Guessing Without Evidence',
+            situation: 'Footprint Guessing Without Evidence',
 
             whatBreaksHere: 'Students guess animals from footprints without observing clues.',
 
@@ -3272,7 +3245,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Web of Life Treated as Game Only',
+            situation: 'Web of Life Treated as Game Only',
 
             whatBreaksHere: 'Students enjoy the game but miss the idea of interdependence.',
 
@@ -3394,7 +3367,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Traditional Knowledge Seen as Old-Fashioned',
+            situation: 'Traditional Knowledge Seen as Old-Fashioned',
 
             whatBreaksHere: 'Students think modern products are always better than traditional ones.',
 
@@ -3410,7 +3383,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Sacred Groves Treated as Just Forests',
+            situation: 'Sacred Groves Treated as Just Forests',
 
             whatBreaksHere: 'Students miss the cultural and protective role of sacred groves.',
 
@@ -3426,7 +3399,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Nature Care Limited to Planting Trees',
+            situation: 'Nature Care Limited to Planting Trees',
 
             whatBreaksHere: 'Students think caring for nature only means planting trees.',
 
@@ -3548,7 +3521,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Six Tastes Treated as Just Flavours',
+            situation: 'Six Tastes Treated as Just Flavours',
 
             whatBreaksHere: 'Students see the six tastes only as taste fun, not health-related.',
 
@@ -3564,7 +3537,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Junk Food Seen as Daily Food',
+            situation: 'Junk Food Seen as Daily Food',
 
             whatBreaksHere: 'Students accept packaged and fast food as regular meals.',
 
@@ -3580,7 +3553,7 @@ const seedData = async () => {
 
           {
 
-            situation: 'Chapter-Specific - Water for Health Underestimated',
+            situation: 'Water for Health Underestimated',
 
             whatBreaksHere: 'Students do not see water as part of healthy food habits.',
 
@@ -3675,4 +3648,3 @@ seedData().then(() => {
   process.exit(1);
 
 });
-
