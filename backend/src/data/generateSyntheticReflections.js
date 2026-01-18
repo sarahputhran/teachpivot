@@ -18,15 +18,66 @@ const REFLECTIONS_PER_CARD_MIN = 5;
 const REFLECTIONS_PER_CARD_MAX = 15;
 const DAYS_SPREAD = 30; // Spread timestamps across this many days
 
-// Outcome distributions
+// Outcome distributions (enum values kept unchanged for database consistency)
 const OUTCOMES = ['worked', 'partially_worked', 'didnt_work'];
-const REASONS = [
+
+// Internal reason codes (used for weighted selection)
+const REASON_CODES = [
     'timing_issue',
     'prerequisite_weak',
     'example_didnt_land',
     'language_confusion',
     'none'
 ];
+
+// =============================================================
+// TEXT FORMATTING HELPERS (FOR RUNTIME/CONSOLE DISPLAY ONLY)
+// 
+// These helpers convert enum values to human-readable text for
+// console output and logs. They are NOT used for database storage.
+// Enum fields must remain machine-safe. Display formatting is
+// handled separately by the frontend or API at runtime.
+// =============================================================
+
+/**
+ * Converts a reason code to plain English (for console display only).
+ * E.g., "prerequisite_weak" → "Prerequisite understanding was weak"
+ * NOTE: Do NOT store this in the database - use raw enum value instead.
+ */
+const reasonToDisplayText = (reasonCode) => {
+    const reasonMap = {
+        'timing_issue': 'Timing did not work well for the class',
+        'prerequisite_weak': 'Prerequisite understanding was weak',
+        'example_didnt_land': 'The example did not connect with students',
+        'language_confusion': 'Language or vocabulary caused confusion',
+        'none': 'No specific issue identified'
+    };
+    return reasonMap[reasonCode] || reasonCode.replace(/_/g, ' ');
+};
+
+/**
+ * Converts an outcome code to Title Case display text (for console display only).
+ * E.g., "partially_worked" → "Partially Worked"
+ * NOTE: Do NOT store this in the database - use raw enum value instead.
+ */
+const outcomeToDisplayText = (outcomeCode) => {
+    const outcomeMap = {
+        'worked': 'Worked',
+        'partially_worked': 'Partially Worked',
+        'didnt_work': "Didn't Work"
+    };
+    return outcomeMap[outcomeCode] || outcomeCode.replace(/_/g, ' ');
+};
+
+/**
+ * Normalizes a situation string for display.
+ * Replaces underscores with spaces and trims.
+ * NOTE: This is safe to use for the `situation` field (free-text, not enum).
+ */
+const normalizeSituation = (situation) => {
+    if (!situation) return '';
+    return situation.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+};
 
 /**
  * Weighted random selection from an array based on weights
@@ -93,7 +144,10 @@ function getReasonWeights(outcome) {
 }
 
 /**
- * Generate reflections for a single PrepCard
+ * Generate reflections for a single PrepCard.
+ * 
+ * NOTE: Enum fields (outcome, reason) must remain machine-safe enum values.
+ * Display formatting is handled separately at runtime by the frontend or API.
  */
 function generateReflectionsForCard(prepCard, isBiasedCard) {
     const reflections = [];
@@ -103,16 +157,19 @@ function generateReflectionsForCard(prepCard, isBiasedCard) {
     for (let i = 0; i < count; i++) {
         const outcome = weightedRandom(OUTCOMES, outcomeWeights);
         const reasonWeights = getReasonWeights(outcome);
-        const reason = weightedRandom(REASONS, reasonWeights);
+        const reason = weightedRandom(REASON_CODES, reasonWeights);
         const timestamp = generateRandomTimestamp(DAYS_SPREAD);
 
+        // Build reflection - enum fields store raw enum values only
         reflections.push({
             subject: prepCard.subject,
             grade: prepCard.grade,
             topicId: prepCard.topicId,
-            situation: prepCard.situation,
-            outcome,
-            reason,
+            // Normalize situation text (free-text field, safe to format)
+            situation: normalizeSituation(prepCard.situation),
+            // Enum fields: store raw enum values, NOT human-readable text
+            outcome,  // enum: worked | partially_worked | didnt_work
+            reason,   // enum: timing_issue | prerequisite_weak | example_didnt_land | language_confusion | none
             timestamp
         });
     }
@@ -178,7 +235,7 @@ async function generateSyntheticReflections() {
         console.log('\n=== Generation Complete ===');
         console.log(`Total reflections inserted: ${allReflections.length}`);
 
-        // Count outcomes
+        // Count outcomes (display with human-readable labels)
         const outcomeCounts = allReflections.reduce((acc, r) => {
             acc[r.outcome] = (acc[r.outcome] || 0) + 1;
             return acc;
@@ -187,10 +244,11 @@ async function generateSyntheticReflections() {
         console.log('\nOutcome distribution:');
         for (const [outcome, count] of Object.entries(outcomeCounts)) {
             const percentage = ((count / allReflections.length) * 100).toFixed(1);
-            console.log(`  ${outcome}: ${count} (${percentage}%)`);
+            // Display with formatted label
+            console.log(`  ${outcomeToDisplayText(outcome)}: ${count} (${percentage}%)`);
         }
 
-        // Count reasons
+        // Count reasons (already stored as human-readable text)
         const reasonCounts = allReflections.reduce((acc, r) => {
             acc[r.reason] = (acc[r.reason] || 0) + 1;
             return acc;
@@ -199,6 +257,7 @@ async function generateSyntheticReflections() {
         console.log('\nReason distribution:');
         for (const [reason, count] of Object.entries(reasonCounts)) {
             const percentage = ((count / allReflections.length) * 100).toFixed(1);
+            // Reasons are already formatted as plain English
             console.log(`  ${reason}: ${count} (${percentage}%)`);
         }
 

@@ -10,6 +10,145 @@ const Curriculum = require('../models/Curriculum');
 
 const PrepCard = require('../models/PrepCard');
 
+// =============================================================
+// TEXT FORMATTING HELPERS
+// Final polish pass – ensures all human-facing text is clean.
+// =============================================================
+
+/**
+ * Converts a string to Title Case.
+ * E.g., "hello world" → "Hello World"
+ */
+const toTitleCase = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+/**
+ * Converts snake_case or hyphenated tokens to human-friendly Title Case.
+ * E.g., "prerequisite_gap" → "Prerequisite Gap"
+ * E.g., "cant_visualize" → "Can't Visualize"
+ * E.g., "worked_once_failed_later" → "Worked Once, Failed Later"
+ */
+const tokenToTitleCase = (token) => {
+  if (!token) return '';
+  // Handle common contractions
+  const contractionMap = {
+    'cant': "Can't",
+    'dont': "Don't",
+    'wont': "Won't",
+    'isnt': "Isn't",
+    'arent': "Aren't",
+    'doesnt': "Doesn't"
+  };
+
+  return token
+    .replace(/[_-]/g, ' ')  // Replace underscores/hyphens with spaces
+    .split(' ')
+    .map(word => {
+      const lower = word.toLowerCase();
+      if (contractionMap[lower]) return contractionMap[lower];
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+};
+
+/**
+ * Normalizes a situation string for display.
+ * Ensures Title Case, replaces underscores, and formats as
+ * "<Concept Label> – <Clear Phrase>" when possible.
+ */
+const normalizeSituation = (situation) => {
+  if (!situation) return '';
+  let result = situation.trim();
+
+  // Replace underscores with spaces
+  result = result.replace(/_/g, ' ');
+
+  // Remove duplicate spaces
+  result = result.replace(/\s+/g, ' ');
+
+  // Remove trailing spaces
+  result = result.trim();
+
+  return result;
+};
+
+/**
+ * Ensures a sentence ends with a period and is grammatically complete.
+ * Removes underscores and normalizes spacing.
+ */
+const normalizeSentence = (text) => {
+  if (!text) return '';
+  let result = text.trim();
+
+  // Replace underscores with spaces
+  result = result.replace(/_/g, ' ');
+
+  // Remove duplicate spaces
+  result = result.replace(/\s+/g, ' ');
+
+  // Ensure ends with period
+  if (result && !/[.!?]$/.test(result)) {
+    result += '.';
+  }
+
+  // Remove duplicate punctuation
+  result = result.replace(/([.!?])\1+/g, '$1');
+
+  return result;
+};
+
+/**
+ * Normalizes array items (earlyWarningSigns, ifStudentsLost, etc.).
+ * Each item: sentence fragment, no trailing punctuation, no underscores.
+ */
+const normalizeListItem = (text) => {
+  if (!text) return '';
+  let result = text.trim();
+
+  // Replace underscores with spaces
+  result = result.replace(/_/g, ' ');
+
+  // Remove duplicate spaces
+  result = result.replace(/\s+/g, ' ');
+
+  // Remove trailing punctuation for list items
+  result = result.replace(/[.,;:!?]+$/, '');
+
+  // Remove trailing spaces
+  result = result.trim();
+
+  return result;
+};
+
+/**
+ * Normalizes an array of list items.
+ */
+const normalizeList = (arr) => {
+  if (!Array.isArray(arr)) return [];
+  return arr.map(item => normalizeListItem(item));
+};
+
+/**
+ * Applies all text normalization to a PrepCard object before insertion.
+ * Does NOT modify topicId (kept as snake_case for machine use).
+ */
+const normalizeCardText = (cardData) => {
+  return {
+    ...cardData,
+    situation: normalizeSituation(cardData.situation),
+    whatBreaksHere: normalizeSentence(cardData.whatBreaksHere),
+    earlyWarningSigns: normalizeList(cardData.earlyWarningSigns),
+    ifStudentsLost: normalizeList(cardData.ifStudentsLost),
+    ifStudentsBored: normalizeList(cardData.ifStudentsBored)
+  };
+};
+
 const connectDB = async () => {
   const mongoURI = process.env.MONGO_URI;
 
@@ -153,33 +292,26 @@ const seedData = async () => {
 
     // ===== PREP CARDS SETUP =====
 
+    // Helper to create a PrepCard with normalized text.
+    // Applies formatting rules to all human-facing text fields.
 
-
-    const makeCard = (subject, grade, topicId, situation, whatBreaksHere, earlyWarningSigns, ifStudentsLost, ifStudentsBored, peerInsight = 'Based on peer classroom trials.') => new PrepCard({
-
-      subject,
-
-      grade,
-
-      topicId,
-
-      situation,
-
-      whatBreaksHere,
-
-      earlyWarningSigns,
-
-      ifStudentsLost,
-
-      ifStudentsBored,
-
-      successRate: 0.65,
-
-      peerInsights: { count: 5, insight: peerInsight },
-
-      confidence: 0.7
-
-    });
+    const makeCard = (subject, grade, topicId, situation, whatBreaksHere, earlyWarningSigns, ifStudentsLost, ifStudentsBored, peerInsight = 'Based on peer classroom trials.') => {
+      const rawCard = {
+        subject,
+        grade,
+        topicId, // Kept as snake_case for machine use
+        situation,
+        whatBreaksHere,
+        earlyWarningSigns,
+        ifStudentsLost,
+        ifStudentsBored,
+        successRate: 0.65,
+        peerInsights: { count: 5, insight: normalizeListItem(peerInsight) },
+        confidence: 0.7
+      };
+      // Apply text normalization before creating the model instance
+      return new PrepCard(normalizeCardText(rawCard));
+    };
 
 
 
@@ -415,7 +547,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'going_mela',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'The lesson assumes real-life exposure that some children don\'t have.',
 
@@ -435,7 +567,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'going_mela',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'One task level doesn\'t suit all learning speeds.',
 
@@ -455,7 +587,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'going_mela',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'New vocabulary blocks concept understanding.',
 
@@ -475,7 +607,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'going_mela',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Excitement overtakes learning purpose.',
 
@@ -557,7 +689,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students lack the basic idea that festivals are special days linked to culture, beliefs, seasons, or events.',
 
@@ -577,7 +709,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'The idea of festivals as social, cultural, or religious practices is missing.',
 
@@ -597,7 +729,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Children assume everyone celebrates festivals the same way.',
 
@@ -617,7 +749,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'Uneven exposure to festivals and language confidence.',
 
@@ -637,7 +769,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Key EVS vocabulary is blocking understanding of ideas.',
 
@@ -657,7 +789,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'celebrating_festivals',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Clear roles and discussion structure are missing.',
 
@@ -739,7 +871,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students lack a basic mental map of plant parts, so new ideas like functions don\'t stick.',
 
@@ -759,7 +891,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Learning is memorised, not connected to real-life meaning.',
 
@@ -779,7 +911,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'The concept stays abstract because students never "see" roots.',
 
@@ -799,7 +931,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'One pace doesn\'t fit all; slower students disengage, faster ones get restless.',
 
@@ -819,7 +951,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Vocabulary is new and not anchored to familiar examples.',
 
@@ -839,7 +971,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Clear task boundaries are missing during activity time.',
 
@@ -921,7 +1053,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students don\'t understand that plants are the starting point of food for animals and humans; they see plants and animals as separate topics, not connected.',
 
@@ -941,7 +1073,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Learning was memorised, not understood; students didn\'t internalise why plants are important for animals.',
 
@@ -961,7 +1093,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Lack of mental images of habitats; learning stays abstract instead of real.',
 
@@ -981,7 +1113,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'Same explanation doesn\'t work for all learners; faster students dominate discussion.',
 
@@ -1001,7 +1133,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Language barrier blocks concept understanding; children know ideas but not the words.',
 
@@ -1021,7 +1153,7 @@ const seedData = async () => {
 
       subject: 'EVS', grade: 3, topicId: 'plants_animals',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Activity goal is unclear; too much freedom, not enough structure.',
 
@@ -1103,7 +1235,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students lack strong place value understanding from earlier grades; they treat numbers as single blocks instead of grouped values.',
 
@@ -1123,7 +1255,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Students memorized patterns but didn\'t internalize place expansion; thousands place is introduced but not conceptually anchored.',
 
@@ -1143,7 +1275,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Numbers are abstract symbols without real-world anchoring; students can\'t connect digits to actual size or amount.',
 
@@ -1163,7 +1295,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'One-speed teaching doesn\'t match varied number sense levels; faster students disengage, slower students panic.',
 
@@ -1183,7 +1315,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Language becomes a barrier, not the math; students know the number but not the words.',
 
@@ -1203,7 +1335,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'whats_name',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Students don\'t know the learning goal of the activity; too many materials without structure.',
 
@@ -1285,7 +1417,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students lack fluency with skip counting and basic number sequences, which the chapter assumes.',
 
@@ -1305,7 +1437,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Students focus on copying instead of identifying the rule behind the pattern.',
 
@@ -1325,7 +1457,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Pattern understanding is too abstract without physical manipulation.',
 
@@ -1345,7 +1477,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'One-level task does not suit all learners.',
 
@@ -1365,7 +1497,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Mathematical language is blocking understanding, not the concept.',
 
@@ -1385,7 +1517,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'toy_joy',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Clear structure and expectations are missing during hands-on work.',
 
@@ -1467,7 +1599,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Place value understanding (ones-tens-hundreds) is weak, so numbers feel like random digits.',
 
@@ -1487,7 +1619,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Transfer of understanding from two-digit to three-digit numbers is not happening.',
 
@@ -1507,7 +1639,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Mental visualization of large quantities is missing.',
 
@@ -1527,7 +1659,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'One-speed teaching doesn\'t match varied number sense levels.',
 
@@ -1547,7 +1679,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Language barrier interferes with mathematical understanding.',
 
@@ -1567,7 +1699,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'double_century',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Clear task structure is missing during activity-based learning.',
 
@@ -1649,7 +1781,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Children do not see numbers as groups of tens and ones; they rely on counting one-by-one instead of jumps.',
 
@@ -1669,7 +1801,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'They memorized steps instead of understanding jumps; transfer of learning is missing.',
 
@@ -1689,7 +1821,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Numbers feel abstract, not like movement; direction (+ / -) is unclear.',
 
@@ -1709,7 +1841,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'Same task given to all despite different speeds.',
 
@@ -1729,7 +1861,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Words like "more", "left", "total" are unclear.',
 
@@ -1749,7 +1881,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'vacation_nani',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Rules not internalized; focus shifts from math to play.',
 
@@ -1831,7 +1963,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'prerequisite_gap',
+      situation: 'Prerequisite Gap',
 
       whatBreaksHere: 'Students don\'t clearly remember basic 2D shapes (square, rectangle, triangle, circle), so new ideas build on shaky ground.',
 
@@ -1851,7 +1983,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'worked_once_failed_later',
+      situation: 'Worked Once, Failed Later',
 
       whatBreaksHere: 'Children memorized shapes earlier but didn\'t understand their properties.',
 
@@ -1871,7 +2003,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'cant_visualize',
+      situation: "Can't Visualize",
 
       whatBreaksHere: 'Students confuse drawings (2D) with real objects (3D).',
 
@@ -1891,7 +2023,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'mixed_pace',
+      situation: 'Mixed Pace Classroom',
 
       whatBreaksHere: 'Same task doesn\'t suit all learning speeds.',
 
@@ -1911,7 +2043,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'language_not_landing',
+      situation: 'Language Not Understood',
 
       whatBreaksHere: 'Math language is unfamiliar and abstract.',
 
@@ -1931,7 +2063,7 @@ const seedData = async () => {
 
       subject: 'Maths', grade: 3, topicId: 'shapes',
 
-      situation: 'activity_chaos',
+      situation: 'Activity Chaos',
 
       whatBreaksHere: 'Students enjoy materials but forget the math goal.',
 
@@ -3585,11 +3717,18 @@ const seedData = async () => {
 
     });
 
-
+    // ===== FINAL TEXT NORMALIZATION PASS =====
+    // Apply text formatting to ALL PrepCards before insertion.
+    // This ensures all human-facing text is clean and readable.
+    const normalizedPrepCards = prepCards.map(card => {
+      const cardObj = card.toObject ? card.toObject() : card;
+      delete cardObj._id; // Remove _id before reinserting
+      return new PrepCard(normalizeCardText(cardObj));
+    });
 
     // Save all prep cards to database
 
-    await PrepCard.insertMany(prepCards);
+    await PrepCard.insertMany(normalizedPrepCards);
 
 
 

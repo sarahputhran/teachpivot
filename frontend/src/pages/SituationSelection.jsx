@@ -5,6 +5,7 @@ import { getSituations } from '../api';
 export default function SituationSelection({ context, onSituationSelect, onBack }) {
   const { t } = useTranslation();
   const [situations, setSituations] = useState([]);
+  const [topicName, setTopicName] = useState(''); // Title Case topic name from API
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,7 +18,10 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
       setLoading(true);
       setError(null);
       const response = await getSituations(context.subject, context.grade, context.topicId);
-      setSituations(response.data || []);
+      // API now returns { topicName, situations } for proper Title Case display
+      const data = response.data || {};
+      setTopicName(data.topicName || context.topicId.replace(/_/g, ' '));
+      setSituations(data.situations || []);
     } catch (err) {
       console.error('Error loading situations:', err);
       setError('Failed to load situations');
@@ -79,7 +83,7 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
             🎯 Grade {context.grade}
           </span>
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 text-rose-800 font-semibold text-sm shadow-sm">
-            💡 {context.topicId.replace(/_/g, ' ')}
+            💡 {topicName || context.topicId.replace(/_/g, ' ')}
           </span>
         </div>
       </div>
@@ -100,8 +104,8 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
               😕
             </div>
             <p className="text-red-600 mb-4 text-lg">{error}</p>
-            <button 
-              onClick={loadSituations} 
+            <button
+              onClick={loadSituations}
               className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold rounded-xl shadow-lg shadow-orange-200 hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               Try again ↻
