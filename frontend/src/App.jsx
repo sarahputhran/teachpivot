@@ -64,8 +64,9 @@ function App() {
   return (
     <div className="relative">
       {offline && (
-        <div className="fixed top-0 left-0 right-0 bg-yellow-100 text-yellow-800 p-2 text-center z-50">
-          📡 You're offline - app uses cached data
+        <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white p-3 text-center z-50 shadow-lg animate-slide-down flex items-center justify-center gap-3">
+          <span className="text-xl animate-bounce">📡</span>
+          <span className="font-medium">You're offline - app uses cached data</span>
         </div>
       )}
 
@@ -81,14 +82,18 @@ function App() {
       )}
       {currentPage === 'crpDashboard' && <CRPDashboard />}
 
-      {/* Home button in top-left (visible after entry) */}
+      {/* Gorgeous home button */}
       {currentPage !== 'entry' && (
         <button
           onClick={handleResetFlow}
-          className="fixed top-4 left-4 bg-white shadow-lg rounded-full w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 z-40"
+          className="fixed top-4 left-4 group z-40"
           title="Home"
         >
-          🏠
+          <div className="relative w-12 h-12 bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl flex items-center justify-center text-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:bg-gradient-to-br group-hover:from-violet-100 group-hover:to-purple-100 overflow-hidden">
+            <span className="relative z-10 group-hover:scale-110 transition-transform">🏠</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+          </div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-black/10 rounded-full blur-sm group-hover:w-10 transition-all"></div>
         </button>
       )}
     </div>
