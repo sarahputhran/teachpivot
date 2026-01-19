@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCRPDashboard, getCRPHeatmap } from '../api';
 
+
 /**
  * Convert snake_case to Title Case
  * e.g., "family_friends" -> "Family Friends"
