@@ -22,17 +22,24 @@ export default function ContextSelection({ onContextSelect, onBack }) {
     }
   }, [subject, grade, step]);
 
-  const loadTopics = async () => {
-    try {
-      setLoading(true);
-      const response = await getTopics(subject, grade);
-      setTopics(response.data);
-    } catch (error) {
-      console.error('Error loading topics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const loadTopics = async () => {
+  try {
+    setLoading(true);
+
+    const response = await getTopics(subject, grade);
+    const data = response.data;
+
+    // ✅ Always normalize to an array
+    setTopics(Array.isArray(data) ? data : data?.topics || []);
+
+  } catch (error) {
+    console.error('Error loading topics:', error);
+    setTopics([]); // fail-safe
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleSubjectSelect = (s) => {
     setSubject(s);

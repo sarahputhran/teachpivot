@@ -9,20 +9,35 @@ export default function PrepCard({ context, situation, onBack }) {
   const [showReflection, setShowReflection] = useState(false);
 
   useEffect(() => {
+  if (context?.subject && context?.grade && context?.topicId && situation) {
     loadPrepCard();
-  }, [context, situation]);
+  }
+}, [context.subject, context.grade, context.topicId, situation]);
 
-  const loadPrepCard = async () => {
-    try {
-      setLoading(true);
-      const response = await getPrepCard(context.subject, context.grade, context.topicId, situation);
-      setCard(response.data);
-    } catch (error) {
-      console.error('Error loading prep card:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadPrepCard = async () => {
+  try {
+    setLoading(true);
+
+    const response = await getPrepCard(
+      context.subject,
+      context.grade,
+      context.topicId,
+      situation
+    );
+
+    const data = response.data;
+
+    // ✅ normalize backend response safely
+    setCard(data?.card ?? data ?? null);
+
+  } catch (error) {
+    console.error('Error loading prep card:', error);
+    setCard(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) {
     return (
