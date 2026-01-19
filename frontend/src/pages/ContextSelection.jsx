@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getTopics } from '../api';
+import { normalizeTopics, validateApiResponse } from '../lib/normalize';
 
 export default function ContextSelection({ onContextSelect, onBack }) {
   const { t } = useTranslation();
@@ -9,6 +10,7 @@ export default function ContextSelection({ onContextSelect, onBack }) {
   const [grade, setGrade] = useState('');
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const subjects = [
     { name: 'Maths', icon: '🧮', gradient: 'from-blue-400 to-indigo-500', bgGradient: 'from-blue-50 to-indigo-50', shadow: 'shadow-blue-200', hoverShadow: 'hover:shadow-blue-300' },
@@ -22,23 +24,33 @@ export default function ContextSelection({ onContextSelect, onBack }) {
     }
   }, [subject, grade, step]);
 
- const loadTopics = async () => {
-  try {
-    setLoading(true);
+  const loadTopics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await getTopics(subject, grade);
-    const data = response.data;
+      const response = await getTopics(subject, grade);
+      const data = response.data;
 
-    // ✅ Always normalize to an array
-    setTopics(Array.isArray(data) ? data : data?.topics || []);
+      // Validate response isn't HTML (Vercel SPA fallback issue)
+      if (!validateApiResponse(data, '/curriculum/topics')) {
+        setError('API configuration error');
+        setTopics([]);
+        return;
+      }
 
-  } catch (error) {
-    console.error('Error loading topics:', error);
-    setTopics([]); // fail-safe
-  } finally {
-    setLoading(false);
-  }
-};
+      // Normalize at the API boundary
+      const normalized = normalizeTopics(data);
+      setTopics(normalized);
+
+    } catch (err) {
+      console.error('Error loading topics:', err);
+      setError('Failed to load topics');
+      setTopics([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleSubjectSelect = (s) => {
@@ -101,13 +113,12 @@ export default function ContextSelection({ onContextSelect, onBack }) {
             {/* Progress indicator */}
             <div className="flex items-center gap-2 mt-2">
               {[1, 2, 3].map((num) => (
-                <div 
+                <div
                   key={num}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${
-                    num <= getStepNumber() 
-                      ? 'bg-gradient-to-r from-violet-500 to-purple-500 w-12' 
-                      : 'bg-gray-200 w-8'
-                  }`}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${num <= getStepNumber()
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-500 w-12'
+                    : 'bg-gray-200 w-8'
+                    }`}
                 />
               ))}
             </div>
@@ -185,11 +196,29 @@ export default function ContextSelection({ onContextSelect, onBack }) {
                 🎯 Grade {grade}
               </span>
             </div>
-            
+
             {loading ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-500 rounded-full animate-spin mb-4"></div>
                 <p className="text-gray-500">{t('common.loading')}</p>
+              </div>
+            ) : error ? (
+              <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 text-center animate-scale-in">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center text-2xl">
+                  ⚠️
+                </div>
+                <p className="text-red-600 font-medium mb-4">{error}</p>
+                <button
+                  onClick={loadTopics}
+                  className="px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                >
+                  Try Again ↻
+                </button>
+              </div>
+            ) : topics.length === 0 ? (
+              <div className="text-center py-10 text-gray-400">
+                <span className="text-4xl block mb-3">📭</span>
+                No topics available
               </div>
             ) : (
               topics.map((topic, index) => (

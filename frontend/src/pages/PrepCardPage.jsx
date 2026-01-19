@@ -1,42 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getPrepCard, submitReflection } from '../api';
+import { normalizePrepCard, validateApiResponse } from '../lib/normalize';
 
 export default function PrepCard({ context, situation, onBack }) {
   const { t } = useTranslation();
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showReflection, setShowReflection] = useState(false);
 
   useEffect(() => {
-  if (context?.subject && context?.grade && context?.topicId && situation) {
-    loadPrepCard();
-  }
-}, [context.subject, context.grade, context.topicId, situation]);
+    if (context?.subject && context?.grade && context?.topicId && situation) {
+      loadPrepCard();
+    }
+  }, [context.subject, context.grade, context.topicId, situation]);
 
-const loadPrepCard = async () => {
-  try {
-    setLoading(true);
+  const loadPrepCard = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await getPrepCard(
-      context.subject,
-      context.grade,
-      context.topicId,
-      situation
-    );
+      const response = await getPrepCard(
+        context.subject,
+        context.grade,
+        context.topicId,
+        situation
+      );
 
-    const data = response.data;
+      const data = response.data;
 
-    // ✅ normalize backend response safely
-    setCard(data?.card ?? data ?? null);
+      // Validate response isn't HTML (Vercel SPA fallback issue)
+      if (!validateApiResponse(data, '/prep-cards')) {
+        setError('API configuration error');
+        setCard(null);
+        return;
+      }
 
-  } catch (error) {
-    console.error('Error loading prep card:', error);
-    setCard(null);
-  } finally {
-    setLoading(false);
-  }
-};
+      // Normalize at the API boundary - components receive clean data
+      const normalized = normalizePrepCard(data);
+      setCard(normalized);
+
+    } catch (error) {
+      console.error('Error loading prep card:', error);
+      setError('Failed to load prep card');
+      setCard(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   if (loading) {
@@ -56,20 +68,29 @@ const loadPrepCard = async () => {
     );
   }
 
-  if (!card) {
+  if (!card || error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex items-center justify-center p-4">
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-10 text-center max-w-md animate-scale-in">
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center text-4xl animate-bounce-gentle">
             😕
           </div>
-          <p className="text-gray-600 text-lg mb-6">{t('common.error')}</p>
-          <button
-            onClick={onBack}
-            className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-105 transition-all duration-300"
-          >
-            {t('common.tryAgain')} ↻
-          </button>
+          <p className="text-gray-600 text-lg mb-4">{t('common.error')}</p>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={loadPrepCard}
+              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              Retry ↻
+            </button>
+            <button
+              onClick={onBack}
+              className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              ← Back
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -94,7 +115,7 @@ const loadPrepCard = async () => {
       <div className="blob w-72 h-72 bg-gradient-to-r from-indigo-200 to-blue-200 -top-10 -right-10 opacity-50"></div>
       <div className="blob w-64 h-64 bg-gradient-to-r from-purple-200 to-pink-200 bottom-20 -left-20 opacity-50" style={{ animationDelay: '-4s' }}></div>
       <div className="blob w-48 h-48 bg-gradient-to-r from-rose-200 to-orange-200 top-1/2 right-10 opacity-40" style={{ animationDelay: '-2s' }}></div>
-      
+
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header Card */}
         <div className="text-center mb-6 animate-slide-down">
@@ -117,8 +138,8 @@ const loadPrepCard = async () => {
             </h2>
             <p className="text-amber-900">
               {typeof card?.whatBreaksHere === 'string' && card.whatBreaksHere.trim()
-              ? card.whatBreaksHere
-              : t('common.noData')}
+                ? card.whatBreaksHere
+                : t('common.noData')}
             </p>
           </div>
 
@@ -128,25 +149,25 @@ const loadPrepCard = async () => {
               <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm">👀</span>
               {t('prepCard.earlyWarnings')}
             </h2>
-           <ul className="space-y-2">
-  {Array.isArray(card?.earlyWarningSigns) && card.earlyWarningSigns.length > 0 ? (
-    card.earlyWarningSigns.map((sign, idx) => (
-      <li
-        key={idx}
-        className="text-blue-900 flex items-start gap-3 group"
-      >
-        <span className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0 group-hover:scale-110 transition-transform">
-          {idx + 1}
-        </span>
-        <span>{sign}</span>
-      </li>
-    ))
-  ) : (
-    <li className="text-blue-400 italic">
-      {t('common.noData')}
-    </li>
-  )}
-</ul>
+            <ul className="space-y-2">
+              {Array.isArray(card?.earlyWarningSigns) && card.earlyWarningSigns.length > 0 ? (
+                card.earlyWarningSigns.map((sign, idx) => (
+                  <li
+                    key={idx}
+                    className="text-blue-900 flex items-start gap-3 group"
+                  >
+                    <span className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0 group-hover:scale-110 transition-transform">
+                      {idx + 1}
+                    </span>
+                    <span>{sign}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-blue-400 italic">
+                  {t('common.noData')}
+                </li>
+              )}
+            </ul>
 
           </div>
 
@@ -157,24 +178,24 @@ const loadPrepCard = async () => {
               {t('prepCard.ifLost')}
             </h2>
             <ul className="space-y-2">
-  {Array.isArray(card?.ifStudentsLost) && card.ifStudentsLost.length > 0 ? (
-    card.ifStudentsLost.map((tip, idx) => (
-      <li
-        key={idx}
-        className="text-rose-900 flex items-start gap-3 group"
-      >
-        <span className="text-rose-500 group-hover:translate-x-1 transition-transform">
-          →
-        </span>
-        <span>{tip}</span>
-      </li>
-    ))
-  ) : (
-    <li className="text-rose-400 italic">
-      {t('common.noData')}
-    </li>
-  )}
-</ul>
+              {Array.isArray(card?.ifStudentsLost) && card.ifStudentsLost.length > 0 ? (
+                card.ifStudentsLost.map((tip, idx) => (
+                  <li
+                    key={idx}
+                    className="text-rose-900 flex items-start gap-3 group"
+                  >
+                    <span className="text-rose-500 group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                    <span>{tip}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-rose-400 italic">
+                  {t('common.noData')}
+                </li>
+              )}
+            </ul>
 
           </div>
 
@@ -185,24 +206,24 @@ const loadPrepCard = async () => {
               {t('prepCard.ifBored')}
             </h2>
             <ul className="space-y-2">
-  {Array.isArray(card?.ifStudentsBored) && card.ifStudentsBored.length > 0 ? (
-    card.ifStudentsBored.map((tip, idx) => (
-      <li
-        key={idx}
-        className="text-emerald-900 flex items-start gap-3 group"
-      >
-        <span className="text-emerald-500 group-hover:translate-x-1 transition-transform">
-          →
-        </span>
-        <span>{tip}</span>
-      </li>
-    ))
-  ) : (
-    <li className="text-emerald-400 italic">
-      {t('common.noData')}
-    </li>
-  )}
-</ul>
+              {Array.isArray(card?.ifStudentsBored) && card.ifStudentsBored.length > 0 ? (
+                card.ifStudentsBored.map((tip, idx) => (
+                  <li
+                    key={idx}
+                    className="text-emerald-900 flex items-start gap-3 group"
+                  >
+                    <span className="text-emerald-500 group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                    <span>{tip}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-emerald-400 italic">
+                  {t('common.noData')}
+                </li>
+              )}
+            </ul>
 
           </div>
 
@@ -214,13 +235,13 @@ const loadPrepCard = async () => {
                 <span className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-xs">✨</span>
                 {t('prepCard.peerInsights')}
               </h2>
-               <p className="text-violet-900 italic">
-  &ldquo;
-  {typeof card?.peerInsights?.insight === 'string' && card.peerInsights.insight.trim()
-    ? card.peerInsights.insight
-    : t('common.noData')}
-  &rdquo;
-</p>
+              <p className="text-violet-900 italic">
+                &ldquo;
+                {typeof card?.peerInsights?.insight === 'string' && card.peerInsights.insight.trim()
+                  ? card.peerInsights.insight
+                  : t('common.noData')}
+                &rdquo;
+              </p>
 
             </div>
           )}
@@ -232,7 +253,7 @@ const loadPrepCard = async () => {
               className="flex-1 relative overflow-hidden bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white py-4 rounded-2xl font-bold shadow-xl shadow-purple-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group gradient-animated"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                {t('prepCard.done')} 
+                {t('prepCard.done')}
                 <span className="group-hover:translate-x-1 transition-transform">✨</span>
               </span>
               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
@@ -300,7 +321,7 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
       <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 flex items-center justify-center p-4 relative overflow-hidden">
         <div className="blob w-80 h-80 bg-gradient-to-r from-emerald-200 to-teal-200 -top-20 -right-20 opacity-50"></div>
         <div className="blob w-72 h-72 bg-gradient-to-r from-cyan-200 to-blue-200 bottom-10 -left-20 opacity-50" style={{ animationDelay: '-3s' }}></div>
-        
+
         {/* Confetti effect */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {[...Array(20)].map((_, i) => (
@@ -317,7 +338,7 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
             />
           ))}
         </div>
-        
+
         <div className="relative z-10 bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-10 max-w-md text-center animate-scale-in">
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-5xl shadow-lg shadow-emerald-200 animate-bounce-gentle">
             ✨
@@ -326,7 +347,7 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
             {t('reflection.thanks')}
           </h2>
           <p className="text-gray-600 text-lg">
-            Your reflection helps improve guidance for all teachers. 
+            Your reflection helps improve guidance for all teachers.
           </p>
           <p className="text-emerald-600 mt-4 font-medium animate-pulse">
             Keep making a difference! 🌟
@@ -341,7 +362,7 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
       {/* Animated background */}
       <div className="blob w-72 h-72 bg-gradient-to-r from-indigo-200 to-purple-200 -top-10 -right-10 opacity-50"></div>
       <div className="blob w-64 h-64 bg-gradient-to-r from-pink-200 to-rose-200 bottom-10 -left-10 opacity-50" style={{ animationDelay: '-4s' }}></div>
-      
+
       <div className="max-w-2xl mx-auto relative z-10">
         <div className="text-center mb-6 animate-slide-down">
           <h1 className="text-2xl font-extrabold text-gradient mb-2">
@@ -358,11 +379,10 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
               <button
                 key={option.value}
                 onClick={() => setOutcome(option.value)}
-                className={`stagger-item w-full py-4 px-5 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-4 group ${
-                  outcome === option.value
-                    ? `bg-gradient-to-r ${option.gradient} text-white shadow-lg scale-[1.02]`
-                    : `bg-gradient-to-r ${option.bg} text-gray-700 hover:shadow-md hover:scale-[1.01]`
-                }`}
+                className={`stagger-item w-full py-4 px-5 rounded-2xl font-semibold transition-all duration-300 flex items-center gap-4 group ${outcome === option.value
+                  ? `bg-gradient-to-r ${option.gradient} text-white shadow-lg scale-[1.02]`
+                  : `bg-gradient-to-r ${option.bg} text-gray-700 hover:shadow-md hover:scale-[1.01]`
+                  }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <span className={`text-2xl ${outcome === option.value ? 'animate-bounce-gentle' : 'group-hover:scale-110 transition-transform'}`}>
@@ -388,11 +408,10 @@ function ReflectionForm({ context, situation, onBack, onSubmit }) {
                   <button
                     key={option.value}
                     onClick={() => setReason(option.value)}
-                    className={`stagger-item w-full py-3 px-4 rounded-xl transition-all duration-300 text-left flex items-center gap-3 ${
-                      reason === option.value
-                        ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg'
-                        : 'bg-gray-50 text-gray-700 hover:bg-violet-50 hover:shadow-sm'
-                    }`}
+                    className={`stagger-item w-full py-3 px-4 rounded-xl transition-all duration-300 text-left flex items-center gap-3 ${reason === option.value
+                      ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg'
+                      : 'bg-gray-50 text-gray-700 hover:bg-violet-50 hover:shadow-sm'
+                      }`}
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <span className="text-lg">{option.icon}</span>

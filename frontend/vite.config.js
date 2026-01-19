@@ -25,6 +25,10 @@ export default defineConfig({
 
     VitePWA({
       registerType: 'autoUpdate',
+      // Disable PWA in development to avoid caching issues
+      devOptions: {
+        enabled: false
+      },
       manifest: {
         name: 'TeachPivot',
         short_name: 'TeachPivot',
@@ -37,15 +41,40 @@ export default defineConfig({
         icons: []
       },
       workbox: {
+        // Skip waiting ensures new service worker activates immediately
+        skipWaiting: true,
+        clientsClaim: true,
+        // Clear old caches on new deployments
+        cleanupOutdatedCaches: true,
+        // Don't precache API routes - let them always go to network
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/curriculum/, /^\/prep-cards/, /^\/crp/, /^\/reflections/],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\./,
-            handler: 'NetworkFirst',
+            // Match relative API calls (local dev with proxy)
+            urlPattern: /^\/(api|curriculum|prep-cards|crp|reflections)\//,
+            handler: 'NetworkOnly', // Changed from NetworkFirst - never cache API
             options: {
-              cacheName: 'teachpivot-api',
+              cacheName: 'teachpivot-api-bypass',
+            }
+          },
+          {
+            // Match absolute API URLs (production with VITE_API_URL)
+            urlPattern: /^https?:\/\/.*\/(api|curriculum|prep-cards|crp|reflections)\//,
+            handler: 'NetworkOnly', // Never cache API responses
+            options: {
+              cacheName: 'teachpivot-external-api-bypass',
+            }
+          },
+          {
+            // Cache static assets aggressively
+            urlPattern: /\.(js|css|png|jpg|jpeg|svg|gif|woff2?)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'teachpivot-static',
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 300
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
           }

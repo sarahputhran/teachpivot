@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getSituations } from '../api';
+import { normalizeSituationsResponse, validateApiResponse } from '../lib/normalize';
 
 export default function SituationSelection({ context, onSituationSelect, onBack }) {
   const { t } = useTranslation();
@@ -10,49 +11,41 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
   const [error, setError] = useState(null);
 
   useEffect(() => {
-  if (context?.topicId) {
-    loadSituations();
-  }
-}, [context.topicId]);
+    if (context?.topicId) {
+      loadSituations();
+    }
+  }, [context.topicId]);
 
 
   const loadSituations = async () => {
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    const response = await getSituations(
-      context.subject,
-      context.grade,
-      context.topicId
-    );
+      const response = await getSituations(
+        context.subject,
+        context.grade,
+        context.topicId
+      );
 
-    // ✅ Normalize response into an array safely
-    let situationsArray = [];
+      // Validate response isn't HTML (Vercel SPA fallback issue)
+      if (!validateApiResponse(response.data, '/prep-cards/situations')) {
+        setError('API configuration error');
+        return;
+      }
 
-    if (Array.isArray(response.data)) {
-      // backend returns array directly
-      situationsArray = response.data;
-    } else if (Array.isArray(response.data?.situations)) {
-      // backend returns { topicName, situations }
-      situationsArray = response.data.situations;
+      // Normalize at the API boundary - handles both array and object responses
+      const normalized = normalizeSituationsResponse(response.data, context.topicId);
+      setSituations(normalized.situations);
+      setTopicName(normalized.topicName);
+
+    } catch (err) {
+      console.error('Error loading situations:', err);
+      setError('Failed to load situations');
+    } finally {
+      setLoading(false);
     }
-
-    setSituations(situationsArray);
-
-    // ✅ Safe topic name
-    setTopicName(
-      response.data?.topicName ||
-      context.topicId.replace(/_/g, ' ')
-    );
-
-  } catch (err) {
-    console.error('Error loading situations:', err);
-    setError('Failed to load situations');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const getIconForIndex = (index) => {
     const icons = ['🎯', '💡', '⚡', '🔥', '✨', '🌟', '💫', '🚀'];

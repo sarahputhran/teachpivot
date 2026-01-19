@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCRPDashboard, getCRPHeatmap } from '../api';
-
-
-/**
- * Convert snake_case to Title Case
- * e.g., "family_friends" -> "Family Friends"
- */
-const toTitleCase = (str) => {
-  if (!str) return '';
-  return str
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
+import { normalizeSignals, normalizeHeatmap, validateApiResponse } from '../lib/normalize';
 
 export default function CRPDashboard() {
   const { t } = useTranslation();
   const [signals, setSignals] = useState([]);
   const [heatmap, setHeatmap] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ subject: '', grade: '' });
 
   useEffect(() => {
@@ -29,14 +18,25 @@ export default function CRPDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const [signalsRes, heatmapRes] = await Promise.all([
         getCRPDashboard(filters),
         getCRPHeatmap(filters)
       ]);
-      setSignals(signalsRes.data);
-      setHeatmap(heatmapRes.data);
+
+      // Validate responses aren't HTML (Vercel SPA fallback issue)
+      if (!validateApiResponse(signalsRes.data, '/crp/dashboard') ||
+        !validateApiResponse(heatmapRes.data, '/crp/heatmap')) {
+        setError('API configuration error');
+        return;
+      }
+
+      // Normalize data at the boundary
+      setSignals(normalizeSignals(signalsRes.data));
+      setHeatmap(normalizeHeatmap(heatmapRes.data));
     } catch (error) {
       console.error('Error loading CRP data:', error);
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,20 @@ export default function CRPDashboard() {
           </div>
         </div>
 
-        {loading ? (
+        {error ? (
+          <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-10 text-center animate-scale-in">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center text-3xl">
+              ⚠️
+            </div>
+            <p className="text-red-600 font-medium mb-4">{error}</p>
+            <button
+              onClick={loadData}
+              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              Try Again ↻
+            </button>
+          </div>
+        ) : loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="relative">
               <div className="w-20 h-20 border-4 border-emerald-200 border-t-emerald-500 rounded-full animate-spin"></div>
@@ -137,8 +150,8 @@ export default function CRPDashboard() {
                     className="stagger-item flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
-                    <div className="w-28 text-sm font-bold text-gray-700 truncate" title={toTitleCase(item.topicId)}>
-                      {toTitleCase(item.topicId)}
+                    <div className="w-28 text-sm font-bold text-gray-700 truncate" title={item.topicName}>
+                      {item.topicName}
                     </div>
                     <div className="flex-1 bg-gray-100 rounded-full h-10 flex items-center overflow-hidden relative">
                       <div
@@ -185,7 +198,7 @@ export default function CRPDashboard() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                        {toTitleCase(signal.topicId)}
+                        {signal.topicName}
                       </div>
                       <div className={`px-3 py-1 rounded-full text-sm font-bold ${getSuccessColor(signal.successRate)} bg-gray-100`}>
                         {(signal.successRate * 100).toFixed(0)}% ✓
@@ -209,7 +222,7 @@ export default function CRPDashboard() {
                               key={idx}
                               className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 text-xs font-medium"
                             >
-                              {toTitleCase(reason.reason)}
+                              {reason.reasonLabel}
                               <span className="bg-violet-200 px-1.5 rounded-full">{reason.count}</span>
                             </span>
                           ))}
