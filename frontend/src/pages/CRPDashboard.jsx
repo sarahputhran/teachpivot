@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCRPDashboard, getCRPHeatmap } from '../api';
 
+/**
+ * Convert snake_case to Title Case
+ * e.g., "family_friends" -> "Family Friends"
+ */
+const toTitleCase = (str) => {
+  if (!str) return '';
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export default function CRPDashboard() {
   const { t } = useTranslation();
   const [signals, setSignals] = useState([]);
@@ -47,7 +59,7 @@ export default function CRPDashboard() {
       <div className="blob w-96 h-96 bg-gradient-to-r from-emerald-200 to-teal-200 -top-20 -left-20 opacity-50"></div>
       <div className="blob w-80 h-80 bg-gradient-to-r from-cyan-200 to-blue-200 bottom-20 -right-20 opacity-50" style={{ animationDelay: '-3s' }}></div>
       <div className="blob w-64 h-64 bg-gradient-to-r from-teal-200 to-emerald-200 top-1/2 left-1/4 opacity-40" style={{ animationDelay: '-5s' }}></div>
-      
+
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-10 animate-slide-down">
@@ -119,13 +131,13 @@ export default function CRPDashboard() {
               </div>
               <div className="space-y-4">
                 {heatmap.map((item, index) => (
-                  <div 
-                    key={item.topicId} 
+                  <div
+                    key={item.topicId}
                     className="stagger-item flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
-                    <div className="w-28 text-sm font-bold text-gray-700 truncate" title={item.topicId}>
-                      {item.topicId}
+                    <div className="w-28 text-sm font-bold text-gray-700 truncate" title={toTitleCase(item.topicId)}>
+                      {toTitleCase(item.topicId)}
                     </div>
                     <div className="flex-1 bg-gray-100 rounded-full h-10 flex items-center overflow-hidden relative">
                       <div
@@ -140,7 +152,7 @@ export default function CRPDashboard() {
                     </div>
                     <div className="w-28 text-sm text-gray-500 flex items-center gap-1">
                       <span className="text-lg">📝</span>
-                      {item.totalReflections} 
+                      {item.totalReflections}
                     </div>
                   </div>
                 ))}
@@ -165,14 +177,14 @@ export default function CRPDashboard() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {signals.map((signal, index) => (
-                  <div 
-                    key={signal._id} 
+                  <div
+                    key={signal._id}
                     className="stagger-item bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300 card-hover group"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="font-bold text-gray-800 group-hover:text-indigo-700 transition-colors">
-                        {signal.topicId}
+                        {toTitleCase(signal.topicId)}
                       </div>
                       <div className={`px-3 py-1 rounded-full text-sm font-bold ${getSuccessColor(signal.successRate)} bg-gray-100`}>
                         {(signal.successRate * 100).toFixed(0)}% ✓
@@ -192,11 +204,11 @@ export default function CRPDashboard() {
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {signal.commonReasons.map((reason, idx) => (
-                            <span 
-                              key={idx} 
+                            <span
+                              key={idx}
                               className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 text-xs font-medium"
                             >
-                              {reason.reason} 
+                              {toTitleCase(reason.reason)}
                               <span className="bg-violet-200 px-1.5 rounded-full">{reason.count}</span>
                             </span>
                           ))}
