@@ -9,20 +9,35 @@ export default function PrepCard({ context, situation, onBack }) {
   const [showReflection, setShowReflection] = useState(false);
 
   useEffect(() => {
+  if (context?.subject && context?.grade && context?.topicId && situation) {
     loadPrepCard();
-  }, [context, situation]);
+  }
+}, [context.subject, context.grade, context.topicId, situation]);
 
-  const loadPrepCard = async () => {
-    try {
-      setLoading(true);
-      const response = await getPrepCard(context.subject, context.grade, context.topicId, situation);
-      setCard(response.data);
-    } catch (error) {
-      console.error('Error loading prep card:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadPrepCard = async () => {
+  try {
+    setLoading(true);
+
+    const response = await getPrepCard(
+      context.subject,
+      context.grade,
+      context.topicId,
+      situation
+    );
+
+    const data = response.data;
+
+    // ✅ normalize backend response safely
+    setCard(data?.card ?? data ?? null);
+
+  } catch (error) {
+    console.error('Error loading prep card:', error);
+    setCard(null);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) {
     return (
@@ -100,7 +115,11 @@ export default function PrepCard({ context, situation, onBack }) {
               <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm">⚠️</span>
               {t('prepCard.whatBreaksHere')}
             </h2>
-            <p className="text-amber-900">{card.whatBreaksHere}</p>
+            <p className="text-amber-900">
+              {typeof card?.whatBreaksHere === 'string' && card.whatBreaksHere.trim()
+              ? card.whatBreaksHere
+              : t('common.noData')}
+            </p>
           </div>
 
           {/* Early Warning Signs */}
@@ -109,16 +128,26 @@ export default function PrepCard({ context, situation, onBack }) {
               <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm">👀</span>
               {t('prepCard.earlyWarnings')}
             </h2>
-            <ul className="space-y-2">
-              {card.earlyWarningSigns?.map((sign, idx) => (
-                <li key={idx} className="text-blue-900 flex items-start gap-3 group">
-                  <span className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0 group-hover:scale-110 transition-transform">
-                    {idx + 1}
-                  </span>
-                  <span>{sign}</span>
-                </li>
-              ))}
-            </ul>
+           <ul className="space-y-2">
+  {Array.isArray(card?.earlyWarningSigns) && card.earlyWarningSigns.length > 0 ? (
+    card.earlyWarningSigns.map((sign, idx) => (
+      <li
+        key={idx}
+        className="text-blue-900 flex items-start gap-3 group"
+      >
+        <span className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-xs font-bold text-blue-700 flex-shrink-0 group-hover:scale-110 transition-transform">
+          {idx + 1}
+        </span>
+        <span>{sign}</span>
+      </li>
+    ))
+  ) : (
+    <li className="text-blue-400 italic">
+      {t('common.noData')}
+    </li>
+  )}
+</ul>
+
           </div>
 
           {/* If Students Are Lost */}
@@ -128,13 +157,25 @@ export default function PrepCard({ context, situation, onBack }) {
               {t('prepCard.ifLost')}
             </h2>
             <ul className="space-y-2">
-              {card.ifStudentsLost?.map((tip, idx) => (
-                <li key={idx} className="text-rose-900 flex items-start gap-3 group">
-                  <span className="text-rose-500 group-hover:translate-x-1 transition-transform">→</span>
-                  <span>{tip}</span>
-                </li>
-              ))}
-            </ul>
+  {Array.isArray(card?.ifStudentsLost) && card.ifStudentsLost.length > 0 ? (
+    card.ifStudentsLost.map((tip, idx) => (
+      <li
+        key={idx}
+        className="text-rose-900 flex items-start gap-3 group"
+      >
+        <span className="text-rose-500 group-hover:translate-x-1 transition-transform">
+          →
+        </span>
+        <span>{tip}</span>
+      </li>
+    ))
+  ) : (
+    <li className="text-rose-400 italic">
+      {t('common.noData')}
+    </li>
+  )}
+</ul>
+
           </div>
 
           {/* If Students Are Bored */}
@@ -144,13 +185,25 @@ export default function PrepCard({ context, situation, onBack }) {
               {t('prepCard.ifBored')}
             </h2>
             <ul className="space-y-2">
-              {card.ifStudentsBored?.map((tip, idx) => (
-                <li key={idx} className="text-emerald-900 flex items-start gap-3 group">
-                  <span className="text-emerald-500 group-hover:translate-x-1 transition-transform">→</span>
-                  <span>{tip}</span>
-                </li>
-              ))}
-            </ul>
+  {Array.isArray(card?.ifStudentsBored) && card.ifStudentsBored.length > 0 ? (
+    card.ifStudentsBored.map((tip, idx) => (
+      <li
+        key={idx}
+        className="text-emerald-900 flex items-start gap-3 group"
+      >
+        <span className="text-emerald-500 group-hover:translate-x-1 transition-transform">
+          →
+        </span>
+        <span>{tip}</span>
+      </li>
+    ))
+  ) : (
+    <li className="text-emerald-400 italic">
+      {t('common.noData')}
+    </li>
+  )}
+</ul>
+
           </div>
 
           {/* Peer Insights */}
@@ -161,7 +214,14 @@ export default function PrepCard({ context, situation, onBack }) {
                 <span className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white text-xs">✨</span>
                 {t('prepCard.peerInsights')}
               </h2>
-              <p className="text-violet-900 italic">&ldquo;{card.peerInsights.insight}&rdquo;</p>
+               <p className="text-violet-900 italic">
+  &ldquo;
+  {typeof card?.peerInsights?.insight === 'string' && card.peerInsights.insight.trim()
+    ? card.peerInsights.insight
+    : t('common.noData')}
+  &rdquo;
+</p>
+
             </div>
           )}
 
