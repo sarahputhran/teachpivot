@@ -10,12 +10,51 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
     useEffect(() => {
         // Load history from localStorage with self-healing deduplication
         try {
-            const stored = localStorage.getItem('teachpivot_prep_history'); // Fixed key name (was inconsistent before?)
-            // Note: PrepCardPage uses 'teachpivot_prep_history'
-            // I should double check if I used two different keys!
+            const stored = localStorage.getItem('teachpivot_prep_history');
 
             if (stored) {
                 let parsed = JSON.parse(stored);
+
+                // =================================================================
+                // SELF-HEALING: Recover missing data from 'teachpivot_history'
+                // This parallel storage key has always contained full context objects
+                // but wasn't being used for the display list. We use it to fix legacy broken cards.
+                // =================================================================
+                try {
+                    const fallbackStored = localStorage.getItem('teachpivot_history');
+                    if (fallbackStored) {
+                        const fallbackHistory = JSON.parse(fallbackStored);
+
+                        // Map situations to their full context for quick lookup
+                        const recoveryMap = new Map();
+                        fallbackHistory.forEach(item => {
+                            if (item.situation && item.context && typeof item.context === 'object') {
+                                recoveryMap.set(item.situation, item.context);
+                            }
+                        });
+
+                        // Heal broken items
+                        parsed = parsed.map(item => {
+                            // If context is a string (legacy broken format)
+                            if (typeof item.context === 'string') {
+                                // Try to find full context for this situation
+                                const recoveredContext = recoveryMap.get(item.situation || item.title);
+                                if (recoveredContext) {
+                                    // Successfully healed!
+                                    return {
+                                        ...item,
+                                        context: recoveredContext, // Replace string with object
+                                        situation: item.situation || item.title // Ensure situation is set
+                                    };
+                                }
+                            }
+                            return item;
+                        });
+                    }
+                } catch (recoveryError) {
+                    console.warn("History recovery failed:", recoveryError);
+                }
+                // =================================================================
 
                 // Deduplicate by ID
                 const seenIds = new Set();
@@ -35,17 +74,8 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
 
                 setHistory(uniqueHistory);
 
-                // Clean up storage if duplicates were found
-                if (uniqueHistory.length < parsed.length) {
-                    localStorage.setItem('teachpivot_prep_history', JSON.stringify(uniqueHistory));
-                }
-            } else {
-                // Fallback check for old key?
-                const oldStored = localStorage.getItem('teachpivot_history');
-                if (oldStored) {
-                    // Migrate old history if needed
-                    // ... for now just ignore to avoid confusion
-                }
+                // Save healed/deduplicated history back to storage
+                localStorage.setItem('teachpivot_prep_history', JSON.stringify(uniqueHistory));
             }
         } catch (e) {
             console.error('Failed to load history', e);
@@ -63,7 +93,22 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
                 h.id === selectedCard.id ? { ...h, reflected: true } : h
             );
             setHistory(updatedHistory);
-            localStorage.setItem('teachpivot_history', JSON.stringify(updatedHistory));
+            // Update both storage keys to keep them in sync
+            localStorage.setItem('teachpivot_prep_history', JSON.stringify(updatedHistory));
+
+            // Also update the fallback storage if possible
+            try {
+                const fallbackStored = localStorage.getItem('teachpivot_history');
+                if (fallbackStored) {
+                    const fallbackHistory = JSON.parse(fallbackStored).map(h =>
+                        (h.id === selectedCard.id || h.cardId === selectedCard.cardId) ? { ...h, reflected: true } : h
+                    );
+                    localStorage.setItem('teachpivot_history', JSON.stringify(fallbackHistory));
+                }
+            } catch (e) {
+                // Ignore fallback update errors
+            }
+
             setSelectedCard(null);
         }
     };
@@ -78,7 +123,7 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
                     <ReflectionForm
                         context={selectedCard.context}
                         situation={selectedCard.situation}
-                        cardId={selectedCard.cardId}
+                        cardId={selectedCard.id || selectedCard.cardId}
                         onBack={() => setSelectedCard(null)}
                         onSubmit={handleReflectionComplete}
                     />
@@ -130,22 +175,16 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <span className="inline-block px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold mb-1">
-                                            {(item.context?.subject || item.subject) ?? 'Subject'} • Gr {(item.context?.grade || item.grade) ?? '—'}
+                                            {/* Handle both object context (new) and string context (legacy) safely */}
+                                            {typeof item.context === 'object'
+                                                ? `${item.context.subject} • Gr ${item.context.grade}`
+                                                : (typeof item.context === 'string' ? item.context : 'Prep Card')}
                                         </span>
                                         <h3 className="font-bold text-gray-800 text-lg leading-tight">
-                                            {item.topicName || item.title || item.situation || 'Prep card'}
+                                            {item.situation || item.title || 'Unknown Situation'}
                                         </h3>
-                                        {item.situation && (
-                                            <p className="text-gray-600 text-sm">
-                                                {item.situation}
-                                            </p>
-                                        )}
                                         <p className="text-gray-400 text-sm mt-1">
-                                            Viewed {(() => {
-                                                const when = item.visitedAt || item.date;
-                                                const parsed = when ? new Date(when) : null;
-                                                return parsed && !isNaN(parsed) ? parsed.toLocaleDateString() : 'Date unavailable';
-                                            })()}
+                                            Viewed {new Date(item.visitedAt || item.date).toLocaleDateString()}
                                         </p>
                                     </div>
                                     {item.reflected ? (
@@ -163,8 +202,19 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
                                 </div>
 
                                 <button
-                                    onClick={() => onNavigateToCard(item.context, item.situation)}
-                                    className="w-full py-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 text-sm font-medium transition-colors flex items-center justify-center gap-2 group-hover:bg-indigo-50 group-hover:text-indigo-600"
+                                    onClick={() => {
+                                        // Only navigate if we have the necessary context
+                                        if (item.context && typeof item.context === 'object' && item.situation) {
+                                            onNavigateToCard(item.context, item.situation);
+                                        } else {
+                                            // Fallback for broken/legacy cards - user might need to recreate them
+                                            alert("This older history card cannot be opened directly. Please create a new card.");
+                                        }
+                                    }}
+                                    className={`w-full py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2 
+                                        ${(item.context && typeof item.context === 'object')
+                                            ? 'bg-gray-50 hover:bg-gray-100 group-hover:bg-indigo-50 group-hover:text-indigo-600 text-gray-600'
+                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                                 >
                                     View Card Again →
                                 </button>

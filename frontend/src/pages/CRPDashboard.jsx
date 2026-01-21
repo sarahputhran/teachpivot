@@ -646,7 +646,19 @@ export default function CRPDashboard({ onHome }) {
       }
 
       // Normalize data at the boundary, preserving flag fields from raw response
-      const rawSignals = signalsRes.data;
+      // Normalize data at the boundary, preserving flag fields from raw response
+      let rawSignals = signalsRes.data;
+      // Handle possible wrapped response { signals: [...] }
+      if (!Array.isArray(rawSignals) && rawSignals?.signals) {
+        rawSignals = rawSignals.signals;
+      }
+
+      let rawHeatmap = heatmapRes.data;
+      // Handle possible wrapped response { heatmap: [...] }
+      if (!Array.isArray(rawHeatmap) && rawHeatmap?.heatmap) {
+        rawHeatmap = rawHeatmap.heatmap;
+      }
+
       const normalized = normalizeSignals(rawSignals);
       const signalsWithFlags = normalized.map((signal, index) => ({
         ...signal,
@@ -658,10 +670,13 @@ export default function CRPDashboard({ onHome }) {
         latestReview: rawSignals[index]?.latestReview || null
       }));
       setSignals(signalsWithFlags);
-      setHeatmap(normalizeHeatmap(heatmapRes.data));
+      setHeatmap(normalizeHeatmap(rawHeatmap));
     } catch (error) {
       console.error('Error loading CRP data:', error);
-      setError('Failed to load dashboard data');
+      const errorMsg = error.response
+        ? `API Error (${error.response.status}): ${error.response.data?.error || error.response.statusText}`
+        : error.message || 'Failed to load dashboard data';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

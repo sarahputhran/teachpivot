@@ -71,17 +71,15 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
         // Add to top with richer metadata so history can display card name and context
         filtered.unshift({
           id: normalized._id,
-          cardId: normalized._id,
-          situation: normalized.situation,
-          topicName: normalized.topicName,
-          subject: normalized.subject,
-          grade: normalized.grade,
+          // Store the FULL context object so PrepHistoryPage can read subject/grade
           context: {
-            subject: normalized.subject,
-            grade: normalized.grade,
-            topicId: normalized.topicId
+            subject: context.subject,
+            grade: context.grade,
+            topicId: context.topicId
           },
-          visitedAt: new Date().toISOString()
+          situation: normalized.situation, // Use situation directly
+          visitedAt: new Date().toISOString(), // Use consistent key 'visitedAt'
+          reflected: false
         });
 
         // Limit to 50 items
@@ -334,7 +332,7 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
             >
               📜 My Prep History
             </button>
-            <p className="text-center text-black text-xl font-bold mt-2">
+            <p className="text-center text-xs text-gray-400 mt-2">
               Feedback available in History after class
             </p>
           </div>
@@ -343,5 +341,3 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
     </div>
   );
 }
-
-

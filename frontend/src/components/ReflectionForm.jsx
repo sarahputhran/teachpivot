@@ -140,7 +140,7 @@ export default function ReflectionForm({ context, situation, cardId, onBack, onS
 
             {/* Optional Feedback */}
             {outcome && (
-                <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <div className="animate-slide-up relative z-10" style={{ animationDelay: '0.1s' }}>
                     <label className="block text-lg font-bold text-gray-700 mb-2 flex items-center gap-2">
                         <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-sm">📝</span>
                         Feedback for Content Team <span className="text-gray-400 font-normal text-sm">(optional)</span>
@@ -149,7 +149,8 @@ export default function ReflectionForm({ context, situation, cardId, onBack, onS
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
                         placeholder="Share more details about what worked or didn't work..."
-                        className="w-full p-4 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all resize-none h-32 text-gray-700"
+                        className="w-full p-4 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all resize-none h-32 text-gray-700 bg-white"
+                        style={{ pointerEvents: 'auto' }}
                     />
                     <div className="flex justify-between items-center mt-2 px-1">
                         <span className={`text-xs font-medium ${feedback.length > 0 && feedback.length < 10 ? 'text-rose-500' :
