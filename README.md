@@ -1,338 +1,204 @@
-# TeachPivot 🎓
+# TeachPivot
 
-> **Teaching guidance that respects your students.** A privacy-first Progressive Web App that helps teachers find effective approaches to common teaching challenges—powered by peer insights, zero surveillance.
+**Just-in-time classroom execution support for government school teachers**
 
----
-
-## 🎯 What is TeachPivot?
-
-**In 30 seconds:**  
-Before class, teachers tap: subject → grade → topic → challenge  
-They get a card showing what usually helps, including peer insights  
-After class, they share what worked (anonymously)  
-The system learns and improves guidance for all teachers  
-
-**No accounts. No tracking. No student data. Just teaching.**
+🌐 **Live Demo:** https://teachpivot.vercel.app  
+🚀 **Hackathon Build • January 2026**
 
 ---
 
-## ✨ Key Features
+## 📋 Overview
 
-- 🔒 **Privacy by Design** — Anonymized immediately, zero user tracking
-- 📱 **PWA** — Installable, works offline, syncs when online
-- 🌍 **Multilingual** — English & Spanish built-in, easily extensible
-- 📊 **CRP Insights** — Dashboard for school planning & teacher coaching
-- 💬 **Peer Learning** — Real advice from teachers who've tried it
-- ⚡ **Lightweight** — Fast on low-bandwidth, government-school devices
-- 🔧 **Deployable** — Self-hosted or cloud, no vendor lock-in
+TeachPivot is a decision support system for government school teachers designed to help anticipate and recover from common classroom breakdowns **before and after a lesson**.
+
+It focuses **exclusively on lesson execution**, not lesson planning, content delivery, or evaluation, and provides structured, context-aware guidance that respects real classroom constraints.
+
+**Core philosophy:**  
+Teacher support should arrive *when it’s needed*, not only during scheduled training or visits.
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Problem Statement
 
-### Fastest: Docker
+Public education systems typically support teachers through:
+
+- Periodic visits (CRP/ARP) that miss daily classroom realities  
+- Short trainings disconnected from specific classroom moments  
+- Generic feedback that arrives too late to help  
+
+**Result:**  
+Teachers know *what* to teach, but struggle with *how lessons actually unfold*: prerequisite gaps, mixed pace classrooms, language barriers, and activity chaos.
+
+When breakdowns occur, support systems are silent.
+
+TeachPivot bridges this gap with **just-in-time, context-aware execution support** without requiring live classroom intervention.
+
+---
+
+## 🧭 Design Principles (Non-Negotiable)
+
+| Principle | Why It Matters |
+|---------|----------------|
+| No live classroom usage | Maintains classroom flow; avoids teacher distraction |
+| No chatbot / free-text input | Fast interaction (<30s); low cognitive load |
+| Structured inputs only | Clean data, predictable patterns, scalable learning |
+| No teacher evaluation | Builds trust; removes performance anxiety |
+| No student data collection | Privacy by design; ethical foundation |
+| Teacher agency preserved | AI supports the teacher; does not replace authority |
+
+---
+
+## ✅ What TeachPivot Is & Is Not
+
+### TeachPivot **Is**
+- 🛡️ Pre-class preparation tool to anticipate breakdowns  
+- 🔄 Post-class reflection tool to improve future execution  
+- 🧩 Pattern-based decision support system  
+- 🌱 Collective learning system via anonymized feedback  
+
+### TeachPivot **Is Not**
+- 🤖 A chatbot or conversational AI  
+- 🎥 A live classroom assistant or surveillance tool  
+- 📝 A lesson planner or content repository  
+- 📊 A teacher evaluation system  
+- 👥 A student analytics platform  
+
+---
+
+## 🃏 Core Feature: Prep Cards
+
+Prep Cards are the **atomic unit** of TeachPivot.
+
+Each card is tightly scoped to:
+
+### Context
+- Grade: 3 or 4  
+- Subject: Mathematics or EVS  
+- One NCERT-aligned chapter  
+- One classroom situation  
+
+### Content (Exactly 4 Blocks)
+1. **What Is Breaking**  
+   The specific classroom failure point  
+2. **Early Warning Signs**  
+   Observable signals teachers can spot early  
+3. **Action (If Lost)**  
+   Concrete steps for remedial understanding  
+4. **Action (If Bored)**  
+   Strategies to recover student engagement  
+
+Language is **classroom-ready and execution-focused** and no pedagogy lectures.
+
+---
+
+## 🎯 Classroom Situations Model
+
+Each chapter defines **exactly nine situations**.
+
+### Fixed Situations (6 per chapter)
+
+1. Prerequisite Gap  
+2. Conceptual Gap  
+3. Can’t Visualize  
+4. Mixed Pace Classroom  
+5. Language Not Understood  
+6. Activity Chaos  
+
+### Chapter-Specific Situations (3 per chapter)
+
+- Derived from DIKSHA teacher training resources  
+- Based on documented misconceptions  
+- Unique per chapter but fixed in number  
+
+This structure ensures **clean, analyzable data** and avoids ambiguity.
+
+---
+
+## 🔒 Hackathon Scope (Intentional Constraints)
+
+| Scope | Details |
+|------|--------|
+| Grades | 3 & 4 |
+| Subjects | Mathematics, EVS (The World Around Us) |
+| Curriculum | NCERT aligned |
+| Coverage | First 5 chapters per subject per grade |
+| Language | English (with classroom-ready vernacular adaptations) |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** React 18, Vite, Tailwind CSS  
+- **Backend:** Node.js, Express.js (REST API)  
+- **Database:** MongoDB + Mongoose  
+- **Deployment:** Vercel (Frontend), Railway/Render (Backend)
+
+---
+
+## 📁 Project Structure
+```
+teachpivot/ ├── client/                    # Frontend React application │   ├── src/ │   │   ├── components/        # UI components (PrepCards, Layouts) │   │   ├── pages/             # Dashboard, ChapterView, PrepView │   │   ├── services/          # API service layer (Axios) │   │   ├── hooks/             # Custom React hooks │   │   └── main.jsx           # Entry point │   ├── public/                # Static assets │   └── package.json │ ├── server/                    # Backend Express application │   ├── src/ │   │   ├── routes/            # API endpoints │   │   ├── controllers/       # Request handlers │   │   ├── models/            # Mongoose schemas │   │   ├── seed/              # Pedagogical data seeding │   │   └── app.js             # Express configuration │   ├── server.js              # Server entry point │   └── package.json │ └── README.md                  # This file
+```
+---
+
+## 🚀 Getting Started
+
+### 1. Backend Setup
+
 ```bash
-docker-compose up
-# Then: http://localhost:5173
+cd backend
+npm install
 ```
-
-### Or: Local
-```bash
-# Backend
-cd backend && npm install && node src/data/seedData.js && npm run dev
-
-# Frontend (new terminal)
-cd frontend && npm install && npm run dev
-# Then: http://localhost:5173
+### Create .env and add:
 ```
-
-### Or: Cloud
-Deploy `backend/` to Heroku/Railway, `frontend/` to Vercel/Netlify, `MongoDB` to Atlas.
-
-**Full setup guide:** [docs/ARCHITECTURE_AND_SETUP.md](docs/ARCHITECTURE_AND_SETUP.md)
-
----
-
-## 📁 What's Inside
-
+MONGODB_URI=your_mongodb_connection_string
+PORT=5000
 ```
-teachpivot/
-├── backend/              # Express.js + MongoDB API
-├── frontend/             # React + Vite + PWA
-├── docs/
-│   ├── ARCHITECTURE_AND_SETUP.md   # Complete tech spec
-│   ├── DEVELOPER_GUIDE.md          # How to contribute
-│   └── GRANT_PROPOSAL.md           # For funding/pilots
-├── SETUP.md              # Installation guide
-└── README.md             # This file
+### Run the backend:
 ```
-
----
-
-## 🎬 How It Works
-
-### Teacher Flow
+npm run dev
 ```
-1. Open app → Select language & role (teacher)
-2. Tap subject (Maths), grade (8), topic (Fractions)
-3. Tap challenge: "Students can't visualize"
-4. Read card:
-   - Why this happens
-   - Warning signs
-   - If lost → try these strategies
-   - If bored → try these strategies
-   - "4 teachers found starting with concrete models helped"
-5. Go teach
-6. Return later → "How did it go?" → Select outcome
-7. Card gets smarter
+### 2. Frontend Setup
 ```
-
-### CRP/School Flow
+cd frontend
+npm install
+npm run dev
 ```
-1. Open app → Select language & role (CRP)
-2. View dashboard:
-   - Topic heatmap (where students struggle)
-   - Situation clusters (what challenges matter most)
-   - Trends (improving/declining)
-3. Use for school planning, teacher coaching, visit prep
+### 3. Seed Data
 ```
-
-### Data Flow
+cd backend
+npm run seed
 ```
-Teacher reflection → MongoDB (anonymized) → Aggregation engine
-                                                    ↓
-                                            Card success rate updated
-                                            CRP dashboard updated
-                                            Peer count updated
-```
+## 🤖 Role of AI
 
-**Privacy guarantee:** No student IDs, no teacher IDs, no email, no name—ever.
+AI in TeachPivot is **intentionally bounded** and used strictly for decision support and system-level learning, not authority or evaluation.
 
----
+### What AI Does
+- **Pattern Matching:** Maps classroom situations to the most relevant Prep Cards.
+- **Trend Analysis:** Identifies recurring challenges across chapters (e.g., repeated “Activity Chaos” in a district).
+- **Relevance Weighting:** Boosts Prep Cards that teachers mark as *high impact* during post-class reflection.
 
-## 🏗️ Tech Stack
-
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Frontend** | React 18 + Vite | Fast builds, Vite PWA plugin |
-| **Styling** | Tailwind CSS | Utility-first, mobile-ready |
-| **i18n** | i18next | Works offline, no external APIs |
-| **Backend** | Node.js + Express | Minimal, lightweight |
-| **Database** | MongoDB | Flexible schema, aggregation pipelines |
-| **Hosting** | Any cloud (AWS, GCP, local) | School choice |
-| **PWA** | Vite PWA + Service Worker | Offline-first, installable |
+### What AI Does Not Do
+- Generate pedagogical or instructional content autonomously  
+- Evaluate or rank teachers  
+- Operate during live classroom instruction  
+- Interact with students or collect student data  
 
 ---
 
-## 📊 Flows (MVP Complete)
+## 📄 License
 
-✅ **Entry** — Language + role selection + explainer  
-✅ **Teacher Context** — Subject / Grade / Topic (tap-only, no search)  
-✅ **Situation** — 6 common teaching challenges  
-✅ **Prep Card** — Single scrollable card with advice  
-✅ **Post-Reflection** — Outcome (worked/partial/no) + reason (optional)  
-✅ **CRP Dashboard** — Heatmap + clusters + filters  
-✅ **Multilingual** — EN + ES (add more in i18n.js)  
-✅ **Offline** — PWA, caching, sync when online  
-✅ **Privacy** — Anonymized by design, no user tracking  
+This project is licensed under the **MIT License**.
+
+Built for the **2026 Education Innovation Hackathon**.
 
 ---
 
-## 🌍 Curriculum Support
+## 💡 Why This Matters
 
-**Currently seeded:** Maths Grades 8-10, fractions (sample data)
+Effective teaching knowledge exists, but it is often trapped in individual experience, isolated classroom visits, or theoretical training.
 
-**To add your curriculum:**
+TeachPivot makes **tacit classroom execution knowledge visible, shareable, and actionable** without judgment, surveillance, or classroom disruption.
 
-1. Edit `backend/src/data/seedData.js`
-2. Add subjects, grades, topics, prep cards
-3. Run: `node src/data/seedData.js`
-4. Update frontend if needed
-
----
-
-## 📱 Browser Support
-
-- **Desktop:** Chrome, Firefox, Safari, Edge (latest 2 versions)
-- **Mobile:** iOS 12+, Android 6+ (Chrome, Firefox)
-- **Works offline:** After first visit (PWA service worker)
-
----
-
-## 🔒 Privacy & Security
-
-### By Design
-✅ No user accounts (anonymous by default)  
-✅ No sessions (no tracking across visits)  
-✅ No student data (only teacher reflections)  
-✅ No individual profiling (document-based, not relational)  
-✅ No push notifications (no background monitoring)  
-✅ No third-party integrations (no analytics, no ads)  
-
-### Data Storage
-```javascript
-// ✅ What we store:
-{ subject: "Maths", grade: 8, topicId: "fractions", outcome: "worked" }
-
-// ❌ What we NEVER store:
-{ userId: "teacher_123", schoolId: "school_456", email: "..." }
-```
-
-### Compliance
-- ✅ GDPR-ready (no personal data)
-- ✅ COPPA-compliant (no student tracking)
-- ✅ Open-source (code review-able)
-- ✅ Deployable on-premise (full control)
-
----
-
-## 💡 Philosophy
-
-**Low cognitive load**  
-→ Tap, don't type. No friction.
-
-**No surveillance**  
-→ Privacy is enforced, not optional.
-
-**Pattern learning**  
-→ Wisdom from the crowd, not algorithms.
-
-**Scales quietly**  
-→ Stateless backend, horizontal scaling.
-
-**Trust by design**  
-→ No user tracking = teachers share honestly.
-
----
-
-## 🚀 Next Steps
-
-### For Teachers
-1. Try it: http://localhost:5173
-2. Go through the flows
-3. Submit feedback: Share what was helpful, what wasn't
-
-### For Schools/CRPs
-1. Deploy (local or cloud)
-2. Customize curriculum with your topics
-3. Share link with teachers
-4. Monitor dashboard for insights
-
-### For Developers
-1. Read [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md)
-2. Extend with more languages, situations, prep cards
-3. Contribute back (PRs welcome)
-4. Deploy improvements
-
-### For Researchers
-1. Run pilot with your school network
-2. Measure adoption, satisfaction, student outcomes
-3. Publish findings
-4. Help improve the system
-
----
-
-## 📈 Roadmap
-
-### Phase 1: MVP (Complete ✅)
-- Entry, context, situation, prep card, reflection
-- CRP dashboard
-- Multilingual (EN, ES)
-- PWA offline support
-
-### Phase 2: Growth (Next)
-- Advanced pattern engine
-- More languages (Hindi, regional)
-- Teacher-specific insights
-- Mobile apps (iOS/Android)
-- Integration with LMS
-
-### Phase 3: Impact (Year 2)
-- Community-contributed curriculum
-- CRP certification program
-- Research partnerships
-- OER license + sustainability
-
----
-
-## 🤝 Contributing
-
-**Want to help?**
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit changes (`git commit -m 'Add feature'`)
-4. Push to branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
-
-**Areas needing help:**
-- 🌍 Translations (more languages)
-- 📚 Curriculum (more subjects/topics)
-- 💬 Peer insights (help curate what works)
-- 🐛 Bug reports & fixes
-- 📖 Documentation
-
----
-
-## 🏫 Pilots & Case Studies
-
-TeachPivot is designed for government schools and education nonprofits.
-
-**Interested in a pilot?**
-1. Review [docs/GRANT_PROPOSAL.md](docs/GRANT_PROPOSAL.md)
-2. Email: [your-email@example.com]
-3. Schedule a demo
-
----
-
-## 📝 License
-
-[Your License - e.g., MIT, Apache 2.0, or OER Commons]
-
----
-
-## 🙏 Acknowledgments
-
-Built with 💚 for teachers.  
-Inspired by peer learning, privacy-first design, and a belief that teaching can be better supported.
-
----
-
-## 📞 Support
-
-**Questions?**
-- 📖 Read the docs: [docs/](docs/)
-- 💬 Open an issue
-- 📧 Email: [your-email]
-
-**Found a bug?**
-- 🐛 File an issue with details
-- 📸 Include screenshots if helpful
-- 🔍 Check existing issues first
-
----
-
-## 🌟 Stats
-
-- **Lines of Code:** ~3,500 (lean)
-- **Database Collections:** 4 (minimal)
-- **API Endpoints:** 8 (focused)
-- **React Components:** 8 (composable)
-- **Languages:** 2 (extensible)
-- **Files:** ~25 core files (organized)
-
----
-
-**TeachPivot MVP v0.1.0**  
-Built January 2026  
-Status: Ready for pilot testing  
-
----
-
-<div align="center">
-
-### Teaching is hard. Peer learning makes it better.
-
-[Get Started](docs/ARCHITECTURE_AND_SETUP.md) • [Developer Guide](docs/DEVELOPER_GUIDE.md) • [Grant Proposal](docs/GRANT_PROPOSAL.md)
-
-</div>
+**Proof of concept • January 2026**  
+Feedback and collaboration are welcome.
