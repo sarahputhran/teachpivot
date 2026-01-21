@@ -93,7 +93,7 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
       </div>
 
       {/* Context Info */}
-      <div className="relative z-10 px-6 py-4 bg-gradient-to-r from-amber-100/80 to-orange-100/80 backdrop-blur-sm border-b border-amber-200/50">
+      <div className="relative z-10 px-4 sm:px-6 py-4 bg-gradient-to-r from-amber-100/80 to-orange-100/80 backdrop-blur-sm border-b border-amber-200/50">
         <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 text-amber-800 font-semibold text-sm shadow-sm">
             📚 {context.subject}
@@ -108,7 +108,7 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-6 max-w-2xl mx-auto">
+      <div className="relative z-10 p-4 sm:p-6 max-w-2xl mx-auto">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="relative">

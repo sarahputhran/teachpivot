@@ -28,28 +28,28 @@ export default function Entry({ onRoleSelect }) {
       <div className="blob w-64 h-64 bg-gradient-to-r from-yellow-200 to-orange-300 top-1/3 right-1/4 opacity-30" style={{ animationDelay: '-5s' }}></div>
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-center px-8 py-6">
+      <div className="relative z-10 flex items-center justify-center px-4 sm:px-6 md:px-8 py-6">
         <div className="flex items-center gap-3 animate-pivot-entrance origin-center" style={{ animationDuration: '4s' }}>
           {/* Logo Removed per user request */}
           <div className="flex flex-col">
-            <h1 className="text-5xl font-extrabold text-gradient-teal drop-shadow-sm">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gradient-teal drop-shadow-sm">
               TeachPivot
             </h1>
-            <p className="text-lg text-gray-600 font-medium ml-1">Prep smarter, pivot faster</p>
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 font-medium ml-1">Prep smarter, pivot faster</p>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] px-6 py-12">
-        <div className="animate-slide-down">
-          <h2 className="text-4xl font-extrabold text-gray-800 mb-4 text-center">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-100px)] px-4 sm:px-6 py-12">
+        <div className="animate-slide-down w-full">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 text-center">
             I am a<span className="text-gradient">...</span>
           </h2>
-          <p className="text-gray-500 text-center mb-12 text-lg">Choose your role to get started</p>
+          <p className="text-gray-500 text-center mb-8 sm:mb-12 text-base sm:text-lg">Choose your role to get started</p>
         </div>
 
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md space-y-4 sm:space-y-6">
           {/* Teacher Card */}
           <button
             onClick={() => handleRoleSelect('teacher')}

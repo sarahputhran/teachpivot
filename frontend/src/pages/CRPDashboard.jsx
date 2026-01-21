@@ -701,7 +701,7 @@ export default function CRPDashboard({ onHome }) {
       <div className="blob w-80 h-80 bg-gradient-to-r from-cyan-200 to-blue-200 bottom-20 -right-20 opacity-50" style={{ animationDelay: '-3s' }}></div>
       <div className="blob w-64 h-64 bg-gradient-to-r from-teal-200 to-emerald-200 top-1/2 left-1/4 opacity-40" style={{ animationDelay: '-5s' }}></div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="w-full max-w-6xl mx-auto relative z-10 px-3 sm:px-4 md:px-6">
         {/* Header */}
         <div className="relative mb-10 animate-slide-down">
           {/* Home Button absolute top right */}

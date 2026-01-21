@@ -146,13 +146,13 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-3 sm:p-4 md:p-6 relative overflow-hidden">
       {/* Animated background blobs */}
-      <div className="blob w-72 h-72 bg-gradient-to-r from-indigo-200 to-blue-200 -top-10 -right-10 opacity-50"></div>
-      <div className="blob w-64 h-64 bg-gradient-to-r from-purple-200 to-pink-200 bottom-20 -left-20 opacity-50" style={{ animationDelay: '-4s' }}></div>
-      <div className="blob w-48 h-48 bg-gradient-to-r from-rose-200 to-orange-200 top-1/2 right-10 opacity-40" style={{ animationDelay: '-2s' }}></div>
+      <div className="blob w-48 sm:w-64 md:w-72 h-48 sm:h-64 md:h-72 bg-gradient-to-r from-indigo-200 to-blue-200 -top-10 -right-10 opacity-50"></div>
+      <div className="blob w-40 sm:w-56 md:w-64 h-40 sm:h-56 md:h-64 bg-gradient-to-r from-purple-200 to-pink-200 bottom-20 -left-20 opacity-50" style={{ animationDelay: '-4s' }}></div>
+      <div className="blob w-32 sm:w-40 md:w-48 h-32 sm:h-40 md:h-48 bg-gradient-to-r from-rose-200 to-orange-200 top-1/2 right-10 opacity-40" style={{ animationDelay: '-2s' }}></div>
 
-      <div className="max-w-2xl mx-auto relative z-10">
+      <div className="w-full max-w-2xl mx-auto relative z-10">
         {/* Header Card */}
         <div className="relative mb-6 animate-slide-down">
           {/* Home Button absolute top right */}
@@ -176,7 +176,7 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-6 space-y-6 overflow-y-auto max-h-[75vh] animate-scale-in">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto max-h-[75vh] animate-scale-in">
           {/* Revision Indicator - shown when CRP has updated this guidance */}
           {card.isRevised && (
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-4 border-l-4 border-emerald-400 animate-slide-down">

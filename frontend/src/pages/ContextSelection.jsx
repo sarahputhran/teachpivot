@@ -136,7 +136,7 @@ export default function ContextSelection({ onContextSelect, onBack, onHome }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 p-6 max-w-lg mx-auto">
+      <div className="relative z-10 p-4 sm:p-6 max-w-lg mx-auto">
         {/* Subject Selection */}
         {
           step === 'subject' && (

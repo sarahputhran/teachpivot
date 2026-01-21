@@ -115,8 +115,8 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
 
     if (selectedCard) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-4 relative overflow-hidden">
-                <div className="max-w-2xl mx-auto relative z-10 pt-10">
+            <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-3 sm:p-4 md:p-6 relative overflow-hidden">
+                <div className="w-full max-w-2xl mx-auto relative z-10 pt-6 sm:pt-10">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                         Reflection: {selectedCard.situation}
                     </h2>
@@ -133,12 +133,12 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 p-3 sm:p-4 md:p-6 relative overflow-hidden">
             {/* Animated background blobs */}
-            <div className="blob w-72 h-72 bg-gradient-to-r from-blue-200 to-indigo-200 -top-10 -right-10 opacity-50"></div>
-            <div className="blob w-64 h-64 bg-gradient-to-r from-purple-200 to-pink-200 bottom-20 -left-20 opacity-50" style={{ animationDelay: '-4s' }}></div>
+            <div className="blob w-48 sm:w-64 md:w-72 h-48 sm:h-64 md:h-72 bg-gradient-to-r from-blue-200 to-indigo-200 -top-10 -right-10 opacity-50"></div>
+            <div className="blob w-40 sm:w-56 md:w-64 h-40 sm:h-56 md:h-64 bg-gradient-to-r from-purple-200 to-pink-200 bottom-20 -left-20 opacity-50\" style={{ animationDelay: '-4s' }}></div>
 
-            <div className="max-w-2xl mx-auto relative z-10">
+            <div className="w-full max-w-2xl mx-auto relative z-10\">
                 <div className="flex items-center gap-4 mb-8 pt-4">
                     <button
                         onClick={onBack}
