@@ -51,12 +51,7 @@ app.use(express.json());
    Routes
    ========================= */
 
-app.use('/api/curriculum', require('./routes/curriculum'));
-app.use('/api/prep-cards', require('./routes/prepCard'));
-app.use('/api/reflections', require('./routes/reflection'));
-app.use('/api/crp', require('./routes/crp'));
-app.use('/api/crp/revisions', require('./routes/revisions'));
-app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api', require('./routes/index'));
 
 
 /* =========================
@@ -89,9 +84,10 @@ app.post('/api/seed', async (req, res) => {
    Health check
    ========================= */
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
+// Health check is now handled in routes/index.js, but keeping a root one for health checks if needed
+// or just rely on /api/health defined in router.
+// Let's remove this duplicate since routes/index.js has /health mapping to /api/health
+
 
 /* =========================
    Server
