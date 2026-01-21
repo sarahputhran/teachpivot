@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const Reflection = require('../models/Reflection');
 const AggregatedSignal = require('../models/AggregatedSignal');
 
-// Each theme maps to:
-// 1. directReasons: enum values from Reflection.reason that directly indicate this theme
-// 2. keywords: terms to match via TF-IDF in situation text
-// =============================================================================
-
 const THEME_DICTIONARY = {
     language_barrier: {
         description: 'Issues related to vocabulary, terminology, or language comprehension',
@@ -73,29 +68,16 @@ const THEME_DICTIONARY = {
 // Get all theme names
 const THEME_NAMES = Object.keys(THEME_DICTIONARY);
 
-// =============================================================================
-// TF-IDF IMPLEMENTATION (Lightweight, No External Dependencies)
-// =============================================================================
-
-/**
- * Tokenize text into lowercase words, removing punctuation
- * @param {string} text - Input text
- * @returns {string[]} - Array of lowercase tokens
- */
 function tokenize(text) {
     if (!text || typeof text !== 'string') return [];
     return text
         .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, ' ')  // Remove punctuation
-        .split(/\s+/)                   // Split on whitespace
-        .filter(token => token.length > 2);  // Remove very short tokens
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(token => token.length > 2);
 }
 
-/**
- * Compute term frequency for a document
- * @param {string[]} tokens - Tokenized document
- * @returns {Map<string, number>} - Term frequency map
- */
+
 function computeTF(tokens) {
     const tf = new Map();
     const totalTokens = tokens.length;
@@ -105,7 +87,6 @@ function computeTF(tokens) {
         tf.set(token, (tf.get(token) || 0) + 1);
     }
 
-    // Normalize by document length
     for (const [term, count] of tf) {
         tf.set(term, count / totalTokens);
     }
@@ -113,17 +94,11 @@ function computeTF(tokens) {
     return tf;
 }
 
-/**
- * Compute inverse document frequency across a corpus
- * @param {string[][]} corpus - Array of tokenized documents
- * @returns {Map<string, number>} - IDF map
- */
 function computeIDF(corpus) {
     const idf = new Map();
     const N = corpus.length;
     if (N === 0) return idf;
 
-    // Count documents containing each term
     const docFreq = new Map();
     for (const tokens of corpus) {
         const uniqueTokens = new Set(tokens);
@@ -132,7 +107,6 @@ function computeIDF(corpus) {
         }
     }
 
-    // Compute IDF: log(N / df)
     for (const [term, df] of docFreq) {
         idf.set(term, Math.log(N / df));
     }
@@ -140,12 +114,6 @@ function computeIDF(corpus) {
     return idf;
 }
 
-/**
- * Compute TF-IDF scores for a single document
- * @param {Map<string, number>} tf - Term frequency map
- * @param {Map<string, number>} idf - IDF map
- * @returns {Map<string, number>} - TF-IDF scores
- */
 function computeTFIDF(tf, idf) {
     const tfidf = new Map();
     for (const [term, tfScore] of tf) {
@@ -155,15 +123,6 @@ function computeTFIDF(tf, idf) {
     return tfidf;
 }
 
-// =============================================================================
-// THEME EXTRACTION LOGIC
-// =============================================================================
-
-/**
- * Map a set of TF-IDF scored terms to theme scores
- * @param {Map<string, number>} tfidf - TF-IDF scores for a document
- * @returns {Object} - Theme scores { themeName: score }
- */
 function mapTermsToThemes(tfidf) {
     const themeScores = {};
 
@@ -171,9 +130,7 @@ function mapTermsToThemes(tfidf) {
         const theme = THEME_DICTIONARY[themeName];
         let score = 0;
 
-        // Sum TF-IDF scores for matching keywords
         for (const keyword of theme.keywords) {
-            // Check for exact match or keyword as part of a token
             for (const [term, tfidfScore] of tfidf) {
                 if (term === keyword || term.includes(keyword) || keyword.includes(term)) {
                     score += tfidfScore;
@@ -181,17 +138,12 @@ function mapTermsToThemes(tfidf) {
             }
         }
 
-        themeScores[themeName] = Math.round(score * 10000) / 10000;  // Round to 4 decimals
+        themeScores[themeName] = Math.round(score * 10000) / 10000;
     }
 
     return themeScores;
 }
 
-/**
- * Count direct reason mappings to themes
- * @param {string[]} reasons - Array of reason enum values
- * @returns {Object} - Theme counts { themeName: count }
- */
 function countDirectReasons(reasons) {
     const themeCounts = {};
 
@@ -213,33 +165,22 @@ function countDirectReasons(reasons) {
     return themeCounts;
 }
 
-/**
- * Aggregate theme signals for a group of reflections
- * @param {Object[]} reflections - Array of reflection documents
- * @param {Map<string, number>} globalIDF - Precomputed IDF across all situations
- * @returns {Object} - Aggregated theme signals
- */
 function aggregateThemeSignals(reflections, globalIDF) {
-    // Initialize aggregated signals
     const themeSignals = {};
     for (const themeName of THEME_NAMES) {
         themeSignals[themeName] = {
-            count: 0,   // Direct reason counts
-            score: 0    // TF-IDF based keyword scores
+            count: 0,
+            score: 0
         };
     }
 
-    // Collect all reasons
     const allReasons = reflections.map(r => r.reason).filter(r => r);
 
-    // Count direct reason mappings
     const reasonCounts = countDirectReasons(allReasons);
     for (const themeName of THEME_NAMES) {
         themeSignals[themeName].count = reasonCounts[themeName];
     }
 
-    // Process situation text via TF-IDF
-    // Since all reflections in a group share the same situation, we use the first one
     const situationText = reflections[0]?.situation || '';
     const tokens = tokenize(situationText);
 
@@ -256,61 +197,26 @@ function aggregateThemeSignals(reflections, globalIDF) {
     return themeSignals;
 }
 
-// =============================================================================
-// MAIN AGGREGATION FUNCTION
-// =============================================================================
-
-/**
- * Run Phase 3 theme extraction and update AggregatedSignal documents
- * @returns {Promise<Object>} - Summary of operations
- */
 async function runThemeExtraction() {
-    const executionTimestamp = new Date().toISOString();
-    console.log('='.repeat(70));
-    console.log('[PHASE 3] Theme Signal Extraction Started');
-    console.log(`[PHASE 3] Timestamp: ${executionTimestamp}`);
-    console.log('='.repeat(70));
+    console.log('[Theme Extraction] Starting...');
 
-    // ========== STEP 1: VERIFY INPUT DATA ==========
     const reflectionCount = await Reflection.countDocuments();
     const aggregatedSignalCount = await AggregatedSignal.countDocuments();
 
-    console.log(`[INPUT] Reflection documents: ${reflectionCount}`);
-    console.log(`[INPUT] AggregatedSignal documents: ${aggregatedSignalCount}`);
-
     if (reflectionCount === 0) {
-        console.log('[INPUT] WARNING: No Reflection documents found.');
+        console.log('[Theme Extraction] No Reflection documents found');
         return { processed: 0, updated: 0, reason: 'No Reflection documents' };
     }
 
     if (aggregatedSignalCount === 0) {
-        console.log('[INPUT] WARNING: No AggregatedSignal documents found. Run Phase 2 first.');
+        console.log('[Theme Extraction] No AggregatedSignal documents found');
         return { processed: 0, updated: 0, reason: 'No AggregatedSignal documents' };
     }
 
-    // ========== STEP 2: BUILD GLOBAL IDF FROM ALL SITUATIONS ==========
-    console.log('[TF-IDF] Building global IDF from all unique situations...');
-
-    // Get all unique situations
     const uniqueSituations = await Reflection.distinct('situation');
-    console.log(`[TF-IDF] Found ${uniqueSituations.length} unique situations`);
-
-    // Tokenize all situations to build corpus
     const corpus = uniqueSituations.map(s => tokenize(s));
     const globalIDF = computeIDF(corpus);
-    console.log(`[TF-IDF] Global vocabulary size: ${globalIDF.size} terms`);
 
-    // Log top IDF terms (most distinctive)
-    const sortedIDF = [...globalIDF.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-    console.log('[TF-IDF] Top 10 distinctive terms (highest IDF):');
-    sortedIDF.forEach(([term, idf]) => {
-        console.log(`  - "${term}": ${idf.toFixed(4)}`);
-    });
-
-    // ========== STEP 3: PROCESS EACH AGGREGATED SIGNAL GROUP ==========
-    console.log('[PROCESSING] Extracting theme signals for each AggregatedSignal...');
-
-    // Get all AggregatedSignal documents
     const aggregatedSignals = await AggregatedSignal.find({}).lean();
 
     let updatedCount = 0;
@@ -328,14 +234,12 @@ async function runThemeExtraction() {
         }).lean();
 
         if (reflections.length === 0) {
-            console.log(`[WARN] No reflections found for signal: ${signal.topicId} - "${signal.situation?.substring(0, 30)}..."`);
             continue;
         }
 
         // Aggregate theme signals
         const themeSignals = aggregateThemeSignals(reflections, globalIDF);
 
-        // Update AggregatedSignal (ONLY collection written to)
         const updateResult = await AggregatedSignal.updateOne(
             { _id: signal._id },
             {
@@ -350,44 +254,13 @@ async function runThemeExtraction() {
             updatedCount++;
         }
 
-        // Progress logging every 20 documents
         if (processedCount % 20 === 0) {
-            console.log(`[PROGRESS] Processed ${processedCount}/${aggregatedSignals.length} documents...`);
+            console.log(`[Progress] ${processedCount}/${aggregatedSignals.length}`);
         }
     }
 
-    // ========== STEP 4: VERIFICATION AND SUMMARY ==========
-    console.log('='.repeat(70));
-    console.log('[PHASE 3] Theme Signal Extraction Complete');
-    console.log(`[WRITES] Documents processed: ${processedCount}`);
-    console.log(`[WRITES] Documents updated in AggregatedSignal: ${updatedCount}`);
-    console.log('[WRITES] CONFIRMATION: Only AggregatedSignal collection was written to.');
-
-    // Verify by checking one updated document
-    const sampleUpdated = await AggregatedSignal.findOne({ themeSignals: { $exists: true } }).lean();
-    if (sampleUpdated) {
-        console.log('\n[SAMPLE] Example updated AggregatedSignal document:');
-        console.log(JSON.stringify({
-            _id: sampleUpdated._id,
-            subject: sampleUpdated.subject,
-            grade: sampleUpdated.grade,
-            topicId: sampleUpdated.topicId,
-            situation: sampleUpdated.situation,
-            totalReflections: sampleUpdated.totalReflections,
-            themeSignals: sampleUpdated.themeSignals,
-            themeLastUpdated: sampleUpdated.themeLastUpdated
-        }, null, 2));
-    }
-
-    console.log('='.repeat(70));
-
-    // ========== SAFETY CHECKS ==========
-    console.log('\n[SAFETY] Final Safety Verification:');
-    console.log('  - Fields written to AggregatedSignal: themeSignals, themeLastUpdated');
-    console.log('  - themeSignals structure: { themeName: { count: Number, score: Number } }');
-    console.log('  - Themes: ' + THEME_NAMES.join(', '));
-    console.log('  - No raw text stored: CONFIRMED');
-    console.log('  - No other collections modified: CONFIRMED');
+    console.log('[Theme Extraction] Complete');
+    console.log(`Processed: ${processedCount}, Updated: ${updatedCount}`);
 
     return {
         processed: processedCount,
@@ -397,9 +270,6 @@ async function runThemeExtraction() {
     };
 }
 
-/**
- * Main entry point for standalone script execution
- */
 async function main() {
     // Check if mongoose is already connected (when called from route)
     if (mongoose.connection.readyState !== 1) {
@@ -423,7 +293,7 @@ async function main() {
 
     try {
         const result = await runThemeExtraction();
-        console.log('\nPhase 3 Theme Extraction completed successfully');
+        console.log('\nTheme extraction completed successfully');
         console.log(JSON.stringify(result, null, 2));
     } catch (error) {
         console.error('Theme extraction failed:', error.message);

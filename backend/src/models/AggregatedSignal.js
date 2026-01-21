@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const aggregatedSignalSchema = new mongoose.Schema({
+  prepCardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PrepCard',
+    default: null
+  },
   subject: String,
   grade: Number,
   topicId: String,
@@ -8,7 +13,6 @@ const aggregatedSignalSchema = new mongoose.Schema({
   totalReflections: Number,
   successCount: Number,
   successRate: Number,
-  // Additional outcome counts for detailed breakdown
   partiallyWorkedCount: {
     type: Number,
     default: 0
@@ -17,14 +21,12 @@ const aggregatedSignalSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // Failure rate = didnt_work_count / total_attempts
   failureRate: {
     type: Number,
     default: 0,
     min: 0,
     max: 1
   },
-  // Confidence score - deterministic function of sample size
   confidenceScore: {
     type: Number,
     default: 0,
@@ -39,7 +41,6 @@ const aggregatedSignalSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  // Phase 3: Theme signals extracted from Reflection text
   themeSignals: {
     type: Map,
     of: {
@@ -51,7 +52,14 @@ const aggregatedSignalSchema = new mongoose.Schema({
   themeLastUpdated: {
     type: Date
   },
-  // Phase 4: Risk flagging metadata
+  crpThemeSignals: {
+    type: Map,
+    of: Number,
+    default: {}
+  },
+  crpThemeLastUpdated: {
+    type: Date
+  },
   isFlagged: {
     type: Boolean,
     default: false
@@ -80,26 +88,22 @@ const aggregatedSignalSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  // Flag resolution tracking - records when a flag was cleared
   resolvedAt: {
     type: Date,
     default: null
   },
-  // Reason the flag was resolved (e.g., "failureRate dropped below threshold")
   resolvedReason: {
     type: String,
     default: null
   },
-  // Count of times this record has been flagged (for audit trail)
   flagHistory: {
     type: Number,
     default: 0
   }
 }, { timestamps: true });
 
-// Create compound index for efficient upserts and lookups
 aggregatedSignalSchema.index(
-  { subject: 1, grade: 1, topicId: 1, situation: 1 },
+  { prepCardId: 1 },
   { unique: true }
 );
 

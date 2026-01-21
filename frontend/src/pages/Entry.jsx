@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Entry({ onRoleSelect }) {
@@ -12,22 +12,37 @@ export default function Entry({ onRoleSelect }) {
     onRoleSelect(role);
   };
 
+  useEffect(() => {
+    // Check if animation has played this session
+    const hasPlayed = sessionStorage.getItem('teachpivot_intro_played');
+    if (!hasPlayed) {
+      setTimeout(() => {
+        sessionStorage.setItem('teachpivot_intro_played', 'true');
+      }, 1500);
+    }
+  }, []);
+
+  const hasPlayed = sessionStorage.getItem('teachpivot_intro_played');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-100 via-pink-50 to-teal-50 relative overflow-hidden">
       {/* Animated background blobs */}
       <div className="blob w-96 h-96 bg-gradient-to-r from-pink-300 to-purple-400 top-0 -left-48 opacity-40"></div>
       <div className="blob w-80 h-80 bg-gradient-to-r from-teal-300 to-cyan-400 bottom-20 -right-40 opacity-40" style={{ animationDelay: '-3s' }}></div>
       <div className="blob w-64 h-64 bg-gradient-to-r from-yellow-200 to-orange-300 top-1/3 right-1/4 opacity-30" style={{ animationDelay: '-5s' }}></div>
-      
+
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-8 py-6">
-        <div className="animate-fade-in">
-          <h1 className="text-3xl font-extrabold text-gradient-teal drop-shadow-sm">
-            ✨ TeachPivot
-          </h1>
-          <p className="text-sm text-gray-600 font-medium mt-1">Prep smarter, pivot faster</p>
+      <div className="relative z-10 flex items-center justify-center px-8 py-6">
+        <div className="flex items-center gap-3 animate-pivot-entrance origin-center" style={{ animationDuration: '4s' }}>
+          {/* Logo Removed per user request */}
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-extrabold text-gradient-teal drop-shadow-sm">
+              TeachPivot
+            </h1>
+            <p className="text-sm text-gray-600 font-medium ml-1">Prep smarter, pivot faster</p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="absolute right-8 flex items-center gap-4">
           <button
             onClick={() => handleLanguageChange(i18n.language === 'en' ? 'es' : 'en')}
             className="relative group flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold text-sm shadow-lg shadow-violet-300 hover:shadow-xl hover:shadow-violet-400 hover:scale-110 transition-all duration-300"
@@ -49,7 +64,7 @@ export default function Entry({ onRoleSelect }) {
           </h2>
           <p className="text-gray-500 text-center mb-12 text-lg">Choose your role to get started</p>
         </div>
-        
+
         <div className="w-full max-w-md space-y-6">
           {/* Teacher Card */}
           <button

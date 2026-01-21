@@ -64,6 +64,7 @@ export const REASON_LABELS: Record<string, string> = {
 // ============ Type Definitions ============
 
 export interface NormalizedPrepCard {
+    _id: string; // Needed for feedback submission
     subject: string;
     grade: number;
     topicId: string;
@@ -124,6 +125,7 @@ export function normalizePrepCard(raw: any): NormalizedPrepCard | null {
     warnMissingField('PrepCard', 'earlyWarningSigns', card.earlyWarningSigns);
 
     return {
+        _id: card._id ?? '',
         subject: card.subject ?? '',
         grade: card.grade ?? 0,
         topicId: card.topicId ?? '',

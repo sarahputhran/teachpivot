@@ -38,6 +38,36 @@ const prepCardSchema = new mongoose.Schema({
     default: 0.5,
     min: 0,
     max: 1
+  },
+  version: {
+    type: Number,
+    default: 1
+  },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  archived: {
+    type: Boolean,
+    default: false
+  },
+  parentPrepCardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PrepCard',
+    default: null
+  },
+  sourcePrepCardId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PrepCard',
+    default: null
+  },
+  triggeringCRPReviewIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CRPReview'
+  }],
+  versionCreatedAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
