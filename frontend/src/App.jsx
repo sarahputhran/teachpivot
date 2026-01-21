@@ -121,13 +121,6 @@ function App() {
 
   return (
     <div className="relative">
-      {offline && (
-        <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white p-3 text-center z-50 shadow-lg animate-slide-down flex items-center justify-center gap-3">
-          <span className="text-xl animate-bounce">📡</span>
-          <span className="font-medium">You're offline - app uses cached data</span>
-        </div>
-      )}
-
       {currentPage === 'entry' && <Entry onRoleSelect={handleRoleSelect} />}
       {currentPage === 'contextSelection' && (
         <ContextSelection

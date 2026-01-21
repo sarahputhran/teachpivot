@@ -141,7 +141,7 @@ export default function ContextSelection({ onContextSelect, onBack, onHome }) {
         {
           step === 'subject' && (
             <div className="space-y-5 mt-8 animate-slide-up">
-              <p className="text-gray-500 text-center mb-8">What would you like to teach today?</p>
+              <p className="text-black text-center text-2xl font-bold mb-8">What would you like to teach today?</p>
               {subjects.map((s, index) => (
                 <button
                   key={s.name}
@@ -174,7 +174,7 @@ export default function ContextSelection({ onContextSelect, onBack, onHome }) {
                   📚 {subject}
                 </span>
               </div>
-              <p className="text-gray-500 text-center mb-6">Which grade are you teaching?</p>
+              <p className="text-black text-center text-2xl font-bold mb-6">Which grade are you teaching?</p>
               {grades.map((g, index) => (
                 <button
                   key={g}

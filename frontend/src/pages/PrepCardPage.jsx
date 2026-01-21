@@ -326,7 +326,7 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
             >
               📜 My Prep History
             </button>
-            <p className="text-center text-xs text-gray-400 mt-2">
+            <p className="text-center text-black text-xl font-bold mt-2">
               Feedback available in History after class
             </p>
           </div>

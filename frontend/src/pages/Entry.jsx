@@ -2,11 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Entry({ onRoleSelect }) {
-  const { t, i18n } = useTranslation();
-
-  const handleLanguageChange = (lang) => {
-    i18n.changeLanguage(lang);
-  };
+  const { t } = useTranslation();
 
   const handleRoleSelect = (role) => {
     onRoleSelect(role);
@@ -36,23 +32,11 @@ export default function Entry({ onRoleSelect }) {
         <div className="flex items-center gap-3 animate-pivot-entrance origin-center" style={{ animationDuration: '4s' }}>
           {/* Logo Removed per user request */}
           <div className="flex flex-col">
-            <h1 className="text-3xl font-extrabold text-gradient-teal drop-shadow-sm">
+            <h1 className="text-5xl font-extrabold text-gradient-teal drop-shadow-sm">
               TeachPivot
             </h1>
-            <p className="text-sm text-gray-600 font-medium ml-1">Prep smarter, pivot faster</p>
+            <p className="text-lg text-gray-600 font-medium ml-1">Prep smarter, pivot faster</p>
           </div>
-        </div>
-        <div className="absolute right-8 flex items-center gap-4">
-          <button
-            onClick={() => handleLanguageChange(i18n.language === 'en' ? 'es' : 'en')}
-            className="relative group flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-600 text-white font-bold text-sm shadow-lg shadow-violet-300 hover:shadow-xl hover:shadow-violet-400 hover:scale-110 transition-all duration-300"
-          >
-            <span className="relative z-10">{i18n.language === 'en' ? 'EN' : 'ES'}</span>
-            <div className="absolute inset-0 rounded-2xl bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-          </button>
-          <button className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 hover:bg-white hover:scale-110 shadow-lg transition-all duration-300 text-xl hover:rotate-90">
-            ⚙️
-          </button>
         </div>
       </div>
 
