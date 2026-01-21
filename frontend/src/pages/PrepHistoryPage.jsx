@@ -130,13 +130,22 @@ export default function PrepHistoryPage({ onBack, onNavigateToCard, onHome }) {
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
                                         <span className="inline-block px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold mb-1">
-                                            {item.context.subject} • Gr {item.context.grade}
+                                            {(item.context?.subject || item.subject) ?? 'Subject'} • Gr {(item.context?.grade || item.grade) ?? '—'}
                                         </span>
                                         <h3 className="font-bold text-gray-800 text-lg leading-tight">
-                                            {item.situation}
+                                            {item.topicName || item.title || item.situation || 'Prep card'}
                                         </h3>
+                                        {item.situation && (
+                                            <p className="text-gray-600 text-sm">
+                                                {item.situation}
+                                            </p>
+                                        )}
                                         <p className="text-gray-400 text-sm mt-1">
-                                            Viewed {new Date(item.visitedAt).toLocaleDateString()}
+                                            Viewed {(() => {
+                                                const when = item.visitedAt || item.date;
+                                                const parsed = when ? new Date(when) : null;
+                                                return parsed && !isNaN(parsed) ? parsed.toLocaleDateString() : 'Date unavailable';
+                                            })()}
                                         </p>
                                     </div>
                                     {item.reflected ? (

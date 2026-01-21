@@ -53,7 +53,7 @@ function App() {
 
   const handleRoleSelect = (selectedRole) => {
     if (selectedRole === 'crp') {
-      const code = prompt("Enter CRP Access Code:");
+      const code = prompt("Enter CRP Access Code:\nPassword (demo): crp12345");
       // Simple hardcoded check for prototype as requested
       if (code !== 'crp12345') {
         alert("Access Denied");

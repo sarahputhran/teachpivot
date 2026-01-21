@@ -66,14 +66,22 @@ export default function PrepCard({ context, situation, onBack, onViewHistory, on
       try {
         const history = JSON.parse(localStorage.getItem('teachpivot_prep_history') || '[]');
         // Remove existing entry for this card ID to avoid duplicates
-        const filtered = history.filter(h => h.id !== normalized._id);
+        const filtered = history.filter(h => h.id !== normalized._id && h.cardId !== normalized._id);
 
-        // Add to top
+        // Add to top with richer metadata so history can display card name and context
         filtered.unshift({
           id: normalized._id,
-          title: normalized.situation,
-          context: `${normalized.subject} • Gr ${normalized.grade}`,
-          date: new Date().toISOString()
+          cardId: normalized._id,
+          situation: normalized.situation,
+          topicName: normalized.topicName,
+          subject: normalized.subject,
+          grade: normalized.grade,
+          context: {
+            subject: normalized.subject,
+            grade: normalized.grade,
+            topicId: normalized.topicId
+          },
+          visitedAt: new Date().toISOString()
         });
 
         // Limit to 50 items
