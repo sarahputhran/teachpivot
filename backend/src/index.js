@@ -55,6 +55,9 @@ app.use('/api/curriculum', require('./routes/curriculum'));
 app.use('/api/prep-cards', require('./routes/prepCard'));
 app.use('/api/reflections', require('./routes/reflection'));
 app.use('/api/crp', require('./routes/crp'));
+app.use('/api/crp/revisions', require('./routes/revisions'));
+app.use('/api/feedback', require('./routes/feedback'));
+
 
 /* =========================
    Manual seed route

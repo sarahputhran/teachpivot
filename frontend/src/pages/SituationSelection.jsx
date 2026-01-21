@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { getSituations } from '../api';
 import { normalizeSituationsResponse, validateApiResponse } from '../lib/normalize';
 
-export default function SituationSelection({ context, onSituationSelect, onBack }) {
+export default function SituationSelection({ context, onSituationSelect, onBack, onHome }) {
   const { t } = useTranslation();
   const [situations, setSituations] = useState([]);
   const [topicName, setTopicName] = useState(''); // Title Case topic name from API
@@ -80,13 +80,21 @@ export default function SituationSelection({ context, onSituationSelect, onBack 
         <div className="flex items-center gap-4 px-6 py-5">
           <button
             onClick={onBack}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 text-xl transition-all duration-300 hover:scale-110 hover:-translate-x-1"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-gray-100 text-gray-700 font-bold border border-gray-200 hover:border-amber-300 shadow-sm hover:shadow-md transition-all duration-300"
           >
-            ←
+            <span>←</span> Back
           </button>
           <h1 className="text-xl font-bold text-gray-800 animate-fade-in">
             🎲 Select a Situation
           </h1>
+          <div className="flex-1"></div>
+          <button
+            onClick={onHome}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 text-xl transition-all duration-300 hover:scale-110 hover:shadow-md ml-auto"
+            title="Return Home"
+          >
+            🏠
+          </button>
         </div>
       </div>
 
