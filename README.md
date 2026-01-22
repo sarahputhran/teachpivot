@@ -18,6 +18,9 @@ Teacher support should arrive *when it’s needed*, not only during scheduled tr
 ---
 
 ## 🚀 Getting Started
+**Prerequisites**
+
+Node.js (v18 or higher) needs to be downloaded — https://nodejs.org
 ### Do the following in Bash Terminal:
 ### 1. Clone the repository
 ```bash
