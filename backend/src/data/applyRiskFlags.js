@@ -57,8 +57,9 @@ const FLAGGING_CONFIG = {
     // Minimum reflections required for a record to be eligible for flagging
     minReflectionsForEligibility: 5,
 
-    // Minimum failure rate (as decimal) to trigger flagging consideration
-    failureRateThreshold: 0.30,
+    // Minimum success rate (as decimal) below which to trigger flagging
+    // Only flag if Success < 35%
+    successRateThreshold: 0.35,
 
     // Minimum percentage of failures a single theme must account for
     // to indicate a concentrated pattern (as decimal, 0.40 = 40%)
@@ -79,6 +80,7 @@ const FLAGGING_CONFIG = {
  */
 function evaluateFlaggingCriteria(signal, config = FLAGGING_CONFIG) {
     const totalReflections = signal.totalReflections || 0;
+    const successRate = signal.successRate || 0;
     const failureRate = signal.failureRate || 0;
     const didntWorkCount = signal.didntWorkCount || 0;
 
@@ -89,9 +91,9 @@ function evaluateFlaggingCriteria(signal, config = FLAGGING_CONFIG) {
             requiredMinimum: config.minReflectionsForEligibility,
             met: totalReflections >= config.minReflectionsForEligibility
         },
-        failureRateCriteria: {
-            failureRate: failureRate,
-            threshold: config.failureRateThreshold,
+        successRateCriteria: {
+            successRate: successRate,
+            threshold: config.successRateThreshold,
             met: false  // Will be evaluated if eligible
         },
         dominantThemeCriteria: {
@@ -113,11 +115,11 @@ function evaluateFlaggingCriteria(signal, config = FLAGGING_CONFIG) {
         };
     }
 
-    // STEP 2: Check failure rate threshold
-    flagReason.failureRateCriteria.met = failureRate >= config.failureRateThreshold;
+    // STEP 2: Check success rate threshold (Flag if Success < Threshold)
+    flagReason.successRateCriteria.met = successRate < config.successRateThreshold;
 
-    if (!flagReason.failureRateCriteria.met) {
-        // Failure rate below threshold - not flagged
+    if (!flagReason.successRateCriteria.met) {
+        // Success rate high enough - not flagged
         return {
             isFlagged: false,
             flagReason: flagReason
@@ -166,11 +168,11 @@ function evaluateFlaggingCriteria(signal, config = FLAGGING_CONFIG) {
         flagReason.dominantThemeCriteria.met = maxPercentage >= config.themeConcentrationThreshold;
     }
 
-    // FINAL DECISION: Flag if ALL criteria are met
+    // FINAL DECISION: Flag if eligibility and success rate criteria are met
+    // Theme concentration is no longer a requirement, just informational
     const isFlagged = (
         flagReason.eligibility.met &&
-        flagReason.failureRateCriteria.met &&
-        flagReason.dominantThemeCriteria.met
+        flagReason.successRateCriteria.met
     );
 
     return {
@@ -193,10 +195,10 @@ function determineResolutionReason(flagReason) {
         reasons.push(`totalReflections (${flagReason.eligibility.totalReflections}) dropped below minimum (${flagReason.eligibility.requiredMinimum})`);
     }
 
-    if (!flagReason.failureRateCriteria.met) {
-        const currentRate = (flagReason.failureRateCriteria.failureRate * 100).toFixed(1);
-        const threshold = (flagReason.failureRateCriteria.threshold * 100).toFixed(1);
-        reasons.push(`failureRate (${currentRate}%) dropped below threshold (${threshold}%)`);
+    if (!flagReason.successRateCriteria.met) {
+        const currentRate = (flagReason.successRateCriteria.successRate * 100).toFixed(1);
+        const threshold = (flagReason.successRateCriteria.threshold * 100).toFixed(1);
+        reasons.push(`successRate (${currentRate}%) rose above threshold (${threshold}%)`);
     }
 
     if (!flagReason.dominantThemeCriteria.met) {
@@ -233,7 +235,7 @@ async function runRiskFlagging() {
     // Log configuration
     console.log('[CONFIG] Flagging thresholds:');
     console.log(`  - Minimum reflections for eligibility: ${FLAGGING_CONFIG.minReflectionsForEligibility}`);
-    console.log(`  - Failure rate threshold: ${FLAGGING_CONFIG.failureRateThreshold * 100}%`);
+    console.log(`  - Success rate threshold: ${FLAGGING_CONFIG.successRateThreshold * 100}%`);
     console.log(`  - Theme concentration threshold: ${FLAGGING_CONFIG.themeConcentrationThreshold * 100}%`);
     console.log('');
 
@@ -292,7 +294,7 @@ async function runRiskFlagging() {
 
             console.log(`  [NEW FLAG] ${signal.subject} / Grade ${signal.grade} / ${signal.topicId}`);
             console.log(`             Situation: "${(signal.situation || '').substring(0, 50)}..."`);
-            console.log(`             Failure Rate: ${(signal.failureRate * 100).toFixed(1)}%`);
+            console.log(`             Success Rate: ${(signal.successRate * 100).toFixed(1)}%`);
             console.log(`             Dominant Theme: ${flagReason.dominantThemeCriteria.themeName} (${(flagReason.dominantThemeCriteria.percentageOfFailures * 100).toFixed(1)}% of failures)`);
 
         } else if (isFlagged && wasAlreadyFlagged) {
