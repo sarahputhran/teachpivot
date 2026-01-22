@@ -88,6 +88,63 @@ export interface NormalizedSituationsResponse {
     situations: NormalizedSituation[];
 }
 
+export interface NormalizedPrepCard {
+    _id: string;
+    subject: string;
+    grade: number;
+    topicId: string;
+    topicName: string;
+    situation: string;
+    whatBreaksHere: string;
+    earlyWarningSigns: string[];
+    ifStudentsLost: string[];
+    ifStudentsBored: string[];
+    successRate: number;
+    peerInsights: {
+        count: number;
+        insight: string;
+    } | null;
+    confidence: number;
+    isRevised?: boolean;
+}
+
+/* =========================
+   PrepCard Normalizer
+   ========================= */
+
+export function normalizePrepCard(raw: any): NormalizedPrepCard | null {
+    const data = unwrapApiData(raw);
+    if (!data) return null;
+
+    const card = data.card ?? data;
+
+    warnMissingField('PrepCard', '_id', card._id);
+    warnMissingField('PrepCard', 'topicId', card.topicId);
+
+    return {
+        _id: card._id ?? '',
+        subject: card.subject ?? '',
+        grade: card.grade ?? 0,
+        topicId: card.topicId ?? '',
+        topicName: toTitleCase(card.topicId),
+        situation: card.situation ?? '',
+        whatBreaksHere: card.whatBreaksHere ?? '',
+        earlyWarningSigns: Array.isArray(card.earlyWarningSigns)
+            ? card.earlyWarningSigns
+            : [],
+        ifStudentsLost: Array.isArray(card.ifStudentsLost)
+            ? card.ifStudentsLost
+            : [],
+        ifStudentsBored: Array.isArray(card.ifStudentsBored)
+            ? card.ifStudentsBored
+            : [],
+        successRate: card.successRate ?? 0.5,
+        peerInsights: card.peerInsights ?? null,
+        confidence: card.confidence ?? 0.5,
+        isRevised: card.isRevised ?? false,
+    };
+}
+
 /* =========================
    Topics Normalizer
    ========================= */
