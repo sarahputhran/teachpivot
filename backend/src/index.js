@@ -6,10 +6,6 @@ const connectDB = require('./middleware/db');
 
 const app = express();
 
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
-
 /* =========================
    Initialize application
    ========================= */

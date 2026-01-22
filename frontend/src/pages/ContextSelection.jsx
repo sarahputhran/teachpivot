@@ -45,13 +45,6 @@ export default function ContextSelection({ onContextSelect, onBack, onHome }) {
 
     } catch (err) {
       console.error('Error loading topics:', err);
-      console.error('[Error loading topics]', {
-        message: err.message,
-        status: err.response?.status,
-        url: err.config?.url,
-        data: err.response?.data,
-      });
-
       setError('Failed to load topics');
       setTopics([]);
     } finally {
@@ -270,4 +263,4 @@ export default function ContextSelection({ onContextSelect, onBack, onHome }) {
       </div >
     </div >
   );
-} 
+}

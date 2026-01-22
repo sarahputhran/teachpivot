@@ -1,7 +1,0 @@
-
---- VERIFICATION RESULTS ---
-Patterns Around Us (54%): isFlagged = false
-Hide And Seek (8%): isFlagged = true
-Patterns Failure Rate: 0.3846
-Hide And Seek Failure Rate: 0.8462
-        

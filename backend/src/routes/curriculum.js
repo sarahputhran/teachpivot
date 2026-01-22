@@ -1,61 +1,35 @@
-import { useEffect, useState } from 'react';
-import { getTopics } from '@/api';
+const express = require('express');
+const router = express.Router();
+const Curriculum = require('../models/Curriculum');
 
-export default function TopicsSection({ subject, grade }) {
-  const [topics, setTopics] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+// GET all subjects and grades
+router.get('/subjects', async (req, res) => {
+  try {
+    const subjects = ['Maths', 'EVS'];
+    const grades = [3, 4];
+    res.json({ subjects, grades });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-  const loadTopics = async () => {
-    setLoading(true);
-    setError(false);          // 🔴 RESET ERROR ON EVERY ATTEMPT
+// GET topics for a subject and grade
+router.get('/:subject/:grade/topics', async (req, res) => {
+  try {
+    const { subject, grade } = req.params;
+    const curriculum = await Curriculum.findOne({
+      subject,
+      grade: parseInt(grade)
+    });
 
-    try {
-      const res = await getTopics(subject, grade);
-      setTopics(res.data || []);
-    } catch (err) {
-      console.error('Error loading topics:', err);
-      setError(true);
-    } finally {
-      setLoading(false);
+    if (!curriculum) {
+      return res.status(404).json({ error: 'Curriculum not found' });
     }
-  };
 
-  useEffect(() => {
-    if (subject && grade) {
-      loadTopics();
-    }
-  }, [subject, grade]);
-
-  /* =========================
-     UI STATES
-     ========================= */
-
-  if (loading) {
-    return <div>Loading topics…</div>;
+    res.json(curriculum.topics || []);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
+});
 
-  if (error) {
-    return (
-      <div>
-        <p style={{ color: 'red' }}>Failed to load topics</p>
-        <button onClick={loadTopics}>Try Again</button>
-      </div>
-    );
-  }
-
-  if (!topics.length) {
-    return <div>No topics available</div>;
-  }
-
-  return (
-    <ul>
-      {topics.map((topic) => (
-        <li key={topic._id || topic.id}>
-          <strong>{topic.name}</strong>
-          <p>{topic.description}</p>
-        </li>
-      ))}
-    </ul>
-  );
-}
+module.exports = router;
