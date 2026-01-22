@@ -4,6 +4,8 @@
 
 🚀 **Hackathon Build • January 2026**
 
+https://teachpivot-rosy.vercel.app/
+
 ---
 
 ## 📋 Overview
