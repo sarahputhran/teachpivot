@@ -2,7 +2,6 @@
 
 **Just-in-time classroom execution support for government school teachers**
 
-🌐 **Live Demo:** https://teachpivot.vercel.app  
 🚀 **Hackathon Build • January 2026**
 
 ---
@@ -16,6 +15,30 @@ It focuses **exclusively on lesson execution**, not lesson planning, content del
 **Core philosophy:**  
 Teacher support should arrive *when it’s needed*, not only during scheduled training or visits.
 
+---
+
+## 🚀 Getting Started
+### Do the following in Bash Terminal:
+### 1. Clone the repository
+```bash
+git clone https://github.com/sarahputhran/teachpivot.git
+cd teachpivot
+```
+
+### 2. Backend Setup
+
+```bash
+cd backend
+npm install
+npm run dev # Run the backend
+```
+
+### 3. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev # Run the frontend
+```
 ---
 
 ## 🎯 Problem Statement
@@ -137,38 +160,32 @@ This structure ensures **clean, analyzable data** and avoids ambiguity.
 
 ## 📁 Project Structure
 ```
-teachpivot/ ├── client/                    # Frontend React application │   ├── src/ │   │   ├── components/        # UI components (PrepCards, Layouts) │   │   ├── pages/             # Dashboard, ChapterView, PrepView │   │   ├── services/          # API service layer (Axios) │   │   ├── hooks/             # Custom React hooks │   │   └── main.jsx           # Entry point │   ├── public/                # Static assets │   └── package.json │ ├── server/                    # Backend Express application │   ├── src/ │   │   ├── routes/            # API endpoints │   │   ├── controllers/       # Request handlers │   │   ├── models/            # Mongoose schemas │   │   ├── seed/              # Pedagogical data seeding │   │   └── app.js             # Express configuration │   ├── server.js              # Server entry point │   └── package.json │ └── README.md                  # This file
+teachpivot/
+├── frontend/
+│   ├── src/
+│   │   ├── components/        # PrepCards, layouts, UI blocks
+│   │   ├── pages/             # Dashboard, ChapterView, PrepView
+│   │   ├── services/          # API layer (Axios)
+│   │   ├── hooks/             # Custom React hooks
+│   │   └── main.jsx           # React entry point
+│   ├── public/                # Static assets
+│   └── package.json
+│
+├── backend/
+│   ├── src/
+│   │   ├── routes/            # REST API routes
+│   │   ├── controllers/       # Request handlers
+│   │   ├── models/            # Mongoose schemas
+│   │   ├── seed/              # Pedagogical data seeding
+│   │   └── app.js             # Express app config
+│   ├── server.js              # Backend entry point
+│   └── package.json
+│
+└── README.md
 ```
+
 ---
 
-## 🚀 Getting Started
-
-### 1. Backend Setup
-
-```bash
-cd backend
-npm install
-```
-### Create .env and add:
-```
-MONGODB_URI=your_mongodb_connection_string
-PORT=5000
-```
-### Run the backend:
-```
-npm run dev
-```
-### 2. Frontend Setup
-```
-cd frontend
-npm install
-npm run dev
-```
-### 3. Seed Data
-```
-cd backend
-npm run seed
-```
 ## 🤖 Role of AI
 
 AI in TeachPivot is **intentionally bounded** and used strictly for decision support and system-level learning, not authority or evaluation.
