@@ -1,17 +1,22 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
 
-if (!API_BASE_URL) {
+if (!import.meta.env.VITE_API_URL && import.meta.env.PROD) {
   console.error(
-    '[TeachPivot] VITE_API_URL is not set. API calls will fail. ' +
-    'Set this environment variable in Vercel dashboard or .env.local'
+    '[TeachPivot] VITE_API_URL is not set in production. API calls will fail. ' +
+    'Set this environment variable in Vercel dashboard.'
   );
 }
 
 const api = axios.create({
-  baseURL: API_BASE_URL || '/api', // Fallback for local dev with proxy
-  timeout: 10000
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 /* =========================
